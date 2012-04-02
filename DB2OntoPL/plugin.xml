@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<?eclipse version="3.0"?>
+
+<plugin>
+   <extension
+         id="ExampleViewComponent"
+         point="org.protege.editor.core.application.ViewComponent">
+      <label
+            value="Example View Component">
+      </label>
+      <class
+            value="dh.protege41.editor.owl.tab.ExampleViewComponent">
+      </class>
+      <category
+            value="@org.protege.ontologycategory">
+      </category>
+   </extension>
+   <extension
+         id="MainWorkspaceTab"
+         point="org.protege.editor.core.application.WorkspaceTab">
+      <label
+            value="DB2OntoPL">
+      </label>
+      <class
+            value="dh.protege41.editor.owl.tab.MainWorkspaceTab">
+      </class>
+      <index
+            value="X">
+      </index>
+      <editorKitId
+            value="OWLEditorKit">
+      </editorKitId>
+      <defaultViewConfigFileName
+            value="viewconfig-DB2OntoPL-Tab.xml">
+      </defaultViewConfigFileName>
+   </extension>
+
+
+</plugin>

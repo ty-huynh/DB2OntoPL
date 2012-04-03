@@ -3,7 +3,7 @@ Bundle-ManifestVersion: 2
 Bundle-Name: DB2OntoPL Plug-in
 Bundle-SymbolicName: dh.protege41.editor.owl.tab;singleton:=true
 Bundle-Category: protege
-Bundle-ContactAddress: p4-feedback@lists.stanford.edu
+Bundle-ContactAddress: hongty.huynh@gmail.com
 Bundle-DocURL: http://protege.stanford.edu
 Bundle-Description: A sample tab for learning how to write a plugin
 Bundle-Vendor: DragonHandsome

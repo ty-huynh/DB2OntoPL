@@ -2,38 +2,35 @@
 <?eclipse version="3.0"?>
 
 <plugin>
+   <!--Example view component -->
    <extension
          id="ExampleViewComponent"
          point="org.protege.editor.core.application.ViewComponent">
-      <label
-            value="Example View Component">
-      </label>
-      <class
-            value="dh.protege41.editor.owl.tab.ExampleViewComponent">
-      </class>
-      <category
-            value="@org.protege.ontologycategory">
-      </category>
+      <label value="Example View Component"></label>
+      <class value="dh.protege41.editor.owl.tab.ExampleViewComponent"></class>
+      <category value="@org.protege.ontologycategory"></category>
+      <headerColor value="@org.protege.classcolor"/>
    </extension>
+   
+   <!--database view component -->
+   <extension
+         id="DatabaseViewComponent"
+         point="org.protege.editor.core.application.ViewComponent">
+      <label value="Database View Component"></label>
+      <class value="dh.protege41.editor.owl.tab.DatabaseViewComponent"></class>
+      <category value="@org.protege.ontologycategory"></category>
+      <headerColor value="@org.protege.classcolor"/>
+   </extension>
+   
+   <!-- Main workspace tab -->
    <extension
          id="MainWorkspaceTab"
          point="org.protege.editor.core.application.WorkspaceTab">
-      <label
-            value="DB2OntoPL">
-      </label>
-      <class
-            value="dh.protege41.editor.owl.tab.MainWorkspaceTab">
-      </class>
-      <index
-            value="X">
-      </index>
-      <editorKitId
-            value="OWLEditorKit">
-      </editorKitId>
-      <defaultViewConfigFileName
-            value="viewconfig-DB2OntoPL-Tab.xml">
+      <label value="DB2OntoPL"></label>
+      <class value="dh.protege41.editor.owl.tab.MainWorkspaceTab"></class>
+      <index value="X"></index>
+      <editorKitId value="OWLEditorKit"></editorKitId>
+      <defaultViewConfigFileName value="viewconfig-DB2OntoPL-Tab.xml">
       </defaultViewConfigFileName>
    </extension>
-
-
 </plugin>

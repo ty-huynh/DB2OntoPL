@@ -5,19 +5,43 @@
    <!--Example view component -->
    <extension
          id="ExampleViewComponent"
+         name="Example View Component"
          point="org.protege.editor.core.application.ViewComponent">
       <label value="Example View Component"></label>
       <class value="dh.protege41.editor.owl.tab.ExampleViewComponent"></class>
       <category value="@org.protege.ontologycategory"></category>
       <headerColor value="@org.protege.classcolor"/>
    </extension>
-   
-   <!--database view component -->
+
+   <!--database detail view component -->
    <extension
-         id="DatabaseViewComponent"
+         id="DatabaseDetailViewComponent"
+         name="Database Detail View Component"
          point="org.protege.editor.core.application.ViewComponent">
       <label value="Database View Component"></label>
-      <class value="dh.protege41.editor.owl.tab.DatabaseViewComponent"></class>
+      <class value="dh.protege41.editor.owl.tab.DatabaseDetailViewComponent"></class>
+      <category value="@org.protege.ontologycategory"></category>
+      <headerColor value="@org.protege.classcolor"/>
+   </extension>
+   
+   <!--database configure view component -->
+   <extension
+         id="DatabaseConfigureViewComponent"
+         name="Database Configure View Component"
+         point="org.protege.editor.core.application.ViewComponent">
+      <label value="Database View Component"></label>
+      <class value="dh.protege41.editor.owl.tab.DatabaseConfigureViewComponent"></class>
+      <category value="@org.protege.ontologycategory"></category>
+      <headerColor value="@org.protege.classcolor"/>
+   </extension>
+   
+   <!--database records view component -->
+   <extension
+         id="DatabaseRecordsViewComponent"
+         name="Database Records View Component"
+         point="org.protege.editor.core.application.ViewComponent">
+      <label value="Database Records Component"></label>
+      <class value="dh.protege41.editor.owl.tab.DatabaseRecordsViewComponent"></class>
       <category value="@org.protege.ontologycategory"></category>
       <headerColor value="@org.protege.classcolor"/>
    </extension>
@@ -25,6 +49,7 @@
    <!-- Main workspace tab -->
    <extension
          id="MainWorkspaceTab"
+         name="Main Workspace Tab"
          point="org.protege.editor.core.application.WorkspaceTab">
       <label value="DB2OntoPL"></label>
       <class value="dh.protege41.editor.owl.tab.MainWorkspaceTab"></class>

@@ -7,32 +7,32 @@ import javax.swing.tree.DefaultMutableTreeNode;
 
 import org.apache.log4j.Logger;
 
-public class TreeComponent extends JTree {
+public class JTreeComponent extends JTree {
 
 	/**
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
 	
-	private static final Logger log = Logger.getLogger(TreeComponent.class);
+	private static final Logger log = Logger.getLogger(JTreeComponent.class);
 	
-	public TreeComponent() {
+	public JTreeComponent() {
 		super();
 	}
 	
-	public TreeComponent(DefaultMutableTreeNode root) {
+	public JTreeComponent(DefaultMutableTreeNode root) {
 		super(root);
 	}
 	
-	public TreeComponent(Object root) {
+	public JTreeComponent(Object root) {
 		super(new DefaultMutableTreeNode(root));
 	}
 	
-	public TreeComponent(Vector<Object> nodes) {
+	public JTreeComponent(Vector<Object> nodes) {
 		super(nodes);
 	}
 	
-	public TreeComponent addNodes(DefaultMutableTreeNode parent, Vector<Object> nodes) {
+	public JTreeComponent addNodes(DefaultMutableTreeNode parent, Vector<Object> nodes) {
 //		parent.add(processHierarchy(nodes));
 		return this;
 	}

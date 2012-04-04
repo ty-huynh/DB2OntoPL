@@ -2,7 +2,7 @@ package dh.protege41.db2onto.tab.ui.util;
 
 import java.util.Vector;
 
-public class TreeNodeVector<E> extends Vector<E> {
+public class JTreeNodeVector<E> extends Vector<E> {
 	/**
 	 * 
 	 */
@@ -10,11 +10,11 @@ public class TreeNodeVector<E> extends Vector<E> {
 	
 	String name;
 	
-	public TreeNodeVector(String name) {
+	public JTreeNodeVector(String name) {
 		this.name = name;
 	}
 	
-	public TreeNodeVector(String name, E elements[]) {
+	public JTreeNodeVector(String name, E elements[]) {
 		this.name = name;
 		for(int i = 0; i < elements.length; i++) {
 			add(elements[i]);

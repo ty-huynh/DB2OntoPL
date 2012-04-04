@@ -11,8 +11,8 @@ import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 
-import dh.protege41.db2onto.tab.ui.util.TreeComponent;
-import dh.protege41.db2onto.tab.ui.util.TreeNodeVector;
+import dh.protege41.db2onto.tab.ui.util.JTreeComponent;
+import dh.protege41.db2onto.tab.ui.util.JTreeNodeVector;
 
 public class DatabaseDetailPanel extends JPanel implements DatabasePanel {
 
@@ -24,7 +24,7 @@ public class DatabaseDetailPanel extends JPanel implements DatabasePanel {
 	private JPanel topPanel;
 	private JPanel centerPanel;
 	
-	private TreeComponent dbTree;
+	private JTreeComponent dbTree;
 	
 	private JButton btn1;
 	private JButton btn2;
@@ -44,14 +44,14 @@ public class DatabaseDetailPanel extends JPanel implements DatabasePanel {
 		centerPanel = new JPanel(new GridLayout(1, 1));
 		centerPanel.setBackground(Color.WHITE);
 		
-		Vector<String> v1 = new TreeNodeVector<String>("TWO", new String[] {"e1", "e2", "e3"});
-		Vector<Object> v2 = new TreeNodeVector<Object>("THREE", new Object[] {"f1", "f2", "f3"});
+		Vector<String> v1 = new JTreeNodeVector<String>("TWO", new String[] {"e1", "e2", "e3"});
+		Vector<Object> v2 = new JTreeNodeVector<Object>("THREE", new Object[] {"f1", "f2", "f3"});
 		v2.add(System.getProperties());
 		Object nodes[] = {v1, v2};
-		Vector<Object> v = new TreeNodeVector<Object>("ROOT", nodes);
-		Vector<Object> rootVector = new TreeNodeVector<Object>("ROOT", new Object[] {v});
+		Vector<Object> v = new JTreeNodeVector<Object>("ROOT", nodes);
+		Vector<Object> rootVector = new JTreeNodeVector<Object>("ROOT", new Object[] {v});
 		
-		dbTree = new TreeComponent(rootVector);
+		dbTree = new JTreeComponent(rootVector);
 		
 		btn1 = new JButton("One");
 		btn2 = new JButton("Two");

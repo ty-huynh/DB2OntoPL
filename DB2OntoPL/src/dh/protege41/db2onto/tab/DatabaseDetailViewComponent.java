@@ -1,13 +1,14 @@
-package dh.protege41.editor.owl.tab;
+package dh.protege41.db2onto.tab;
 
 import java.awt.BorderLayout;
 
 import org.apache.log4j.Logger;
 import org.protege.editor.owl.ui.view.AbstractOWLViewComponent;
 
-import dh.protege41.editor.owl.tab.database.DatabaseRecordsPanel;
+import dh.protege41.db2onto.tab.ui.DatabaseDetailPanel;
 
-public class DatabaseRecordsViewComponent extends AbstractOWLViewComponent{
+public class DatabaseDetailViewComponent extends AbstractOWLViewComponent {
+
 	/**
 	 * 
 	 */
@@ -15,7 +16,7 @@ public class DatabaseRecordsViewComponent extends AbstractOWLViewComponent{
 	
 	private final static Logger log = Logger.getLogger(DatabaseDetailViewComponent.class);
 	
-	private DatabaseRecordsPanel databaseRecordsComponent;
+	private DatabaseDetailPanel databaseDetailComponent;
 	
 	@Override
 	protected void disposeOWLView() {
@@ -27,8 +28,9 @@ public class DatabaseRecordsViewComponent extends AbstractOWLViewComponent{
 	protected void initialiseOWLView() throws Exception {
 		// TODO Auto-generated method stub
 		setLayout(new BorderLayout());
-		databaseRecordsComponent = new DatabaseRecordsPanel();
-		add(databaseRecordsComponent, BorderLayout.CENTER);
-		log.info("database records view component initialized!");
+		databaseDetailComponent = new DatabaseDetailPanel();
+		add(databaseDetailComponent, BorderLayout.CENTER);
+		log.info("database detail view component initialized!");
 	}
+
 }

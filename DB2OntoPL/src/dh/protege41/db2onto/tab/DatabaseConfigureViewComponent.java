@@ -1,11 +1,11 @@
-package dh.protege41.editor.owl.tab;
+package dh.protege41.db2onto.tab;
 
 import java.awt.BorderLayout;
 
 import org.apache.log4j.Logger;
 import org.protege.editor.owl.ui.view.AbstractOWLViewComponent;
 
-import dh.protege41.editor.owl.tab.database.DatabaseConfigurePanel;
+import dh.protege41.db2onto.tab.ui.DatabaseConfigurePanel;
 
 public class DatabaseConfigureViewComponent extends AbstractOWLViewComponent{
 	/**

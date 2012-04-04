@@ -1,4 +1,4 @@
-package dh.protege41.editor.owl.tab.database;
+package dh.protege41.db2onto.tab.ui;
 
 import javax.swing.JTabbedPane;
 

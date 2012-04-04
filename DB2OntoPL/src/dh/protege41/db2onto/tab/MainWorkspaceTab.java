@@ -1,4 +1,4 @@
-package dh.protege41.editor.owl.tab;
+package dh.protege41.db2onto.tab;
 
 import org.protege.editor.owl.ui.OWLWorkspaceViewsTab;
 

@@ -4,8 +4,11 @@ import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 
+import org.apache.log4j.Logger;
+
 public class TestConnection {
 	DBOperationImplement dbOperation = null;
+	private static final Logger log = Logger.getLogger(TestConnection.class);
 	
 	public void MSAccessTest () throws SQLException {
 		String database = "E:\\ty\\Students.mdb";
@@ -19,6 +22,10 @@ public class TestConnection {
 		String url = "jdbc:sqlserver://localhost:1433;databaseName=" + database + ";selectMethod=cursor";
 		dbOperation = new DBOperationImplement(DBDriver.SQLSERVER, url, database, "sa", "12345");
 		System.out.println(DBType.SQLSERVER);
+	}
+	
+	public void DatabaseConnectionTest(String driver, String dbName, String url, String user, String pass) {
+		dbOperation = new DBOperationImplement(driver, url, dbName, user, pass);
 	}
 	
 	public void ExeTest() throws SQLException{
@@ -35,12 +42,12 @@ public class TestConnection {
 		dbOperation = null;
 	}
 	
-	public static void main(String args[]) throws Exception {
-		TestConnection test = new TestConnection();
-		test.MSAccessTest();
-		test.ExeTest();
-		
+//	public static void main(String args[]) throws Exception {
+//		TestConnection test = new TestConnection();
+////		test.MSAccessTest();
+////		test.ExeTest();
+//		
 //		test.SQLServerTest();
 //		test.ExeTest();
-	}
+//	}
 }

@@ -125,4 +125,16 @@ public class DatabaseRecordsPanel extends JPanel implements DatabasePanel {
 		frame.setSize(400, 250);
 		frame.setVisible(true);
 	}
+
+	@Override
+	public void initEventListeners() {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void handleEvents(int event) {
+		// TODO Auto-generated method stub
+		
+	}
 }

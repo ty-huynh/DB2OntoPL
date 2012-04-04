@@ -7,8 +7,9 @@ Bundle-ContactAddress: hongty.huynh@gmail.com
 Bundle-DocURL: http://protege.stanford.edu
 Bundle-Description: A sample tab for learning how to write a plugin
 Bundle-Vendor: DragonHandsome
-Bundle-ClassPath: .,lib/examplelib.jar
-Import-Package: javax.swing,
+Bundle-ClassPath: .,lib/sqljdbc4.jar
+Import-Package: javax.net.ssl,
+ javax.swing,
  javax.swing.border,
  javax.swing.colorchooser,
  javax.swing.event,
@@ -27,8 +28,8 @@ Import-Package: javax.swing,
  javax.swing.undo,
  javax.xml.parsers,
  org.apache.commons.lang,
- org.osgi.framework,
- org.apache.log4j
+ org.apache.log4j,
+ org.osgi.framework
 Bundle-Version: 4.0.9
 Require-Bundle: org.eclipse.equinox.registry,
  org.eclipse.equinox.common,

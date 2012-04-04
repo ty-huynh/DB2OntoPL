@@ -3,14 +3,25 @@ package dh.protege41.editor.owl.tab.database;
 import java.awt.BorderLayout;
 import java.awt.FlowLayout;
 import java.awt.GridLayout;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.sql.SQLException;
 
 import javax.swing.JButton;
 import javax.swing.JComboBox;
+import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 
+import org.apache.log4j.Logger;
+
+import sun.awt.windows.ThemeReader;
+
+import dh.database.api.DBDriver;
 import dh.database.api.DBType;
+import dh.database.api.TestConnection;
 
 public class DatabaseConfigurePanel extends JPanel implements DatabasePanel {
 
@@ -18,6 +29,7 @@ public class DatabaseConfigurePanel extends JPanel implements DatabasePanel {
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
+	private static final Logger log = Logger.getLogger(DatabaseConfigurePanel.class);
 	
 	private JPanel panelCenter;
 	private JPanel panelBottom;
@@ -44,11 +56,14 @@ public class DatabaseConfigurePanel extends JPanel implements DatabasePanel {
 	private JButton btnCancel;
 	
 	private final String[] dbTypes = {DBType.MSACCESS, DBType.SQLSERVER};
+	private final String[] dbDrivers = {DBDriver.MSACCESS, DBDriver.SQLSERVER};
+	
 	public DatabaseConfigurePanel() {
 //		setLayout(new FlowLayout(FlowLayout.CENTER));
 //		add(new JButton("This is database configure form"));
 		initComponents();
 		attachComponents();
+		initEventListeners();
 	}
 	
 	public void initComponents() {
@@ -57,8 +72,10 @@ public class DatabaseConfigurePanel extends JPanel implements DatabasePanel {
 		panelBottom = new JPanel(new FlowLayout(FlowLayout.CENTER));
 		
 		cbbDBType = new JComboBox(dbTypes);
+		cbbDBType.setSelectedIndex(0);
 		
-		tfDriver = new JTextField(30);
+		tfDriver = new JTextField(dbDrivers[cbbDBType.getSelectedIndex()], 30);
+		
 		tfDBName = new JTextField(30);
 		tfHost = new JTextField(30);
 		tfPort = new JTextField(30);
@@ -98,6 +115,102 @@ public class DatabaseConfigurePanel extends JPanel implements DatabasePanel {
 		
 	}
 	
+	
+	@Override
+	public void initEventListeners() {
+		// TODO Auto-generated method stub
+		cbbDBType.addActionListener(new ActionListener() {
+			
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				// TODO Auto-generated method stub
+				handleEvents(DatabasePanel.DB_EVENT_DBTYPE_CHANGED);
+			}
+		});
+		
+		btnChange.addActionListener(new ActionListener() {
+			
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				// TODO Auto-generated method stub
+				handleEvents(DatabasePanel.DB_EVENT_CHANGE);
+			}
+		});
+		
+		btnLoad.addActionListener(new ActionListener() {
+			
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				// TODO Auto-generated method stub
+				handleEvents(DatabasePanel.DB_EVENT_LOAD);
+			}
+		});
+		
+		btnCancel.addActionListener(new ActionListener() {
+			
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				// TODO Auto-generated method stub
+				handleEvents(DatabasePanel.DB_EVENT_CANCEL);
+			}
+		});
+	}
+	
+
+	@Override
+	public void handleEvents(int event) {
+		// TODO Auto-generated method stub
+		switch(event) {
+			case DatabasePanel.DB_EVENT_CHANGE : {
+				
+			}; break;
+			case DatabasePanel.DB_EVENT_LOAD : {
+				Thread thread = new Thread(new Runnable() {
+					
+					@Override
+					public void run() {
+						// TODO Auto-generated method stub
+						loadDatabase();
+					}
+				});
+				thread.start();
+				
+				
+			}; break;
+			case DatabasePanel.DB_EVENT_CANCEL : {
+				
+			}; break;
+			case DatabasePanel.DB_EVENT_DBTYPE_CHANGED : {
+//				putMessages("Selected " + cbbDBType.getSelectedItem());
+				tfDriver.setText(dbDrivers[cbbDBType.getSelectedIndex()]);
+			}; break;
+		}
+//		putMessages("Event " + event);
+	}
+	
+	public void putMessages(String message) {
+		JOptionPane.showMessageDialog(null, message);
+	}
+	
+	//should use connection pooler
+	public void loadDatabase() {
+		String driver = tfDriver.getText().trim();
+		String databaseName = tfDBName.getText().trim();
+		String url = "jdbc:sqlserver://" + tfHost.getText().trim() + ":" + tfPort.getText().trim() + ";databaseName=" + databaseName + ";selectMethod=cursor";
+		String user = tfUsername.getText().trim();
+		String pass = tfPassword.getText().trim();
+		
+		log.info(driver + ", " + url + ", " + user + ", " + pass);
+		TestConnection test = new TestConnection();
+		test.DatabaseConnectionTest(driver, databaseName, url, user, pass);
+		try {
+			test.ExeTest();
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+	
 //	public static void main(String args[]) {
 //		JFrame frame = new JFrame("Design Test");
 //		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -106,7 +219,11 @@ public class DatabaseConfigurePanel extends JPanel implements DatabasePanel {
 //		
 //		frame.add(main);
 //		
-//		frame.setSize(400, 250);
+//		frame.setSize(400, 600);
 //		frame.setVisible(true);
 //	}
+
+	
+
+	
 }

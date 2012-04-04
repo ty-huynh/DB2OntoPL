@@ -105,6 +105,20 @@ public class DatabaseDetailPanel extends JPanel implements DatabasePanel {
 		add(topPanel, BorderLayout.NORTH);
 		add(centerPanel, BorderLayout.CENTER);
 	}
+
+
+	@Override
+	public void initEventListeners() {
+		// TODO Auto-generated method stub
+		
+	}
+
+
+	@Override
+	public void handleEvents(int event) {
+		// TODO Auto-generated method stub
+		
+	}
 	
 //	public static void main(String args[]) {
 //		JFrame frame = new JFrame("Design Test");

@@ -3,6 +3,8 @@ package dh.database.api;
 import java.sql.Connection;
 import java.sql.DriverManager;
 
+import org.apache.log4j.Logger;
+
 public class DBConnection {
 	
 	String driver = "";
@@ -14,6 +16,7 @@ public class DBConnection {
 	String password = "";
 	String dbType = "";
 	
+	private static final Logger log = Logger.getLogger(DBConnection.class);
 	
 	public DBConnection() {
 		

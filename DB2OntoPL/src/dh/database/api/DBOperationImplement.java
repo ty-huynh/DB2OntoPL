@@ -5,11 +5,13 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 
+import org.apache.log4j.Logger;
+
 public class DBOperationImplement implements DBOperation {
 
 	Connection conn = null;
 	DBConnection dbConnection = null;
-	
+	private static final Logger log = Logger.getLogger(DBOperationImplement.class);
 	
 	public DBOperationImplement() {
 		dbConnection = new DBConnection();

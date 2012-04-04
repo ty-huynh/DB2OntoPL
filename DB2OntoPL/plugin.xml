@@ -8,7 +8,7 @@
          name="Example View Component"
          point="org.protege.editor.core.application.ViewComponent">
       <label value="Example View Component"></label>
-      <class value="dh.protege41.editor.owl.tab.ExampleViewComponent"></class>
+      <class value="dh.protege41.db2onto.tab.ExampleViewComponent"></class>
       <category value="@org.protege.ontologycategory"></category>
       <headerColor value="@org.protege.classcolor"/>
    </extension>
@@ -19,7 +19,7 @@
          name="Database Detail View Component"
          point="org.protege.editor.core.application.ViewComponent">
       <label value="Database View Component"></label>
-      <class value="dh.protege41.editor.owl.tab.DatabaseDetailViewComponent"></class>
+      <class value="dh.protege41.db2onto.tab.DatabaseDetailViewComponent"></class>
       <category value="@org.protege.ontologycategory"></category>
       <headerColor value="@org.protege.classcolor"/>
    </extension>
@@ -30,7 +30,7 @@
          name="Database Configure View Component"
          point="org.protege.editor.core.application.ViewComponent">
       <label value="Database View Component"></label>
-      <class value="dh.protege41.editor.owl.tab.DatabaseConfigureViewComponent"></class>
+      <class value="dh.protege41.db2onto.tab.DatabaseConfigureViewComponent"></class>
       <category value="@org.protege.ontologycategory"></category>
       <headerColor value="@org.protege.classcolor"/>
    </extension>
@@ -41,7 +41,7 @@
          name="Database Records View Component"
          point="org.protege.editor.core.application.ViewComponent">
       <label value="Database Records Component"></label>
-      <class value="dh.protege41.editor.owl.tab.DatabaseRecordsViewComponent"></class>
+      <class value="dh.protege41.db2onto.tab.DatabaseRecordsViewComponent"></class>
       <category value="@org.protege.ontologycategory"></category>
       <headerColor value="@org.protege.classcolor"/>
    </extension>
@@ -52,7 +52,7 @@
          name="Main Workspace Tab"
          point="org.protege.editor.core.application.WorkspaceTab">
       <label value="DB2OntoPL"></label>
-      <class value="dh.protege41.editor.owl.tab.MainWorkspaceTab"></class>
+      <class value="dh.protege41.db2onto.tab.MainWorkspaceTab"></class>
       <index value="X"></index>
       <editorKitId value="OWLEditorKit"></editorKitId>
       <defaultViewConfigFileName value="viewconfig-DB2OntoPL-Tab.xml">

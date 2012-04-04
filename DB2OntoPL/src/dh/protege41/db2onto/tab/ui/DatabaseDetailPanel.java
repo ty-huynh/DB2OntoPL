@@ -4,14 +4,15 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.FlowLayout;
 import java.awt.GridLayout;
+import java.util.Vector;
 
 import javax.swing.JButton;
 import javax.swing.JFrame;
-import javax.swing.JLabel;
 import javax.swing.JPanel;
-import javax.swing.JTextArea;
-import javax.swing.JTree;
-import javax.swing.tree.DefaultMutableTreeNode;
+import javax.swing.JScrollPane;
+
+import dh.protege41.db2onto.tab.ui.util.TreeComponent;
+import dh.protege41.db2onto.tab.ui.util.TreeNodeVector;
 
 public class DatabaseDetailPanel extends JPanel implements DatabasePanel {
 
@@ -23,17 +24,7 @@ public class DatabaseDetailPanel extends JPanel implements DatabasePanel {
 	private JPanel topPanel;
 	private JPanel centerPanel;
 	
-	private JTree dbTree;
-	private DefaultMutableTreeNode root;
-	private DefaultMutableTreeNode table_1;
-	private DefaultMutableTreeNode table_2;
-	private DefaultMutableTreeNode table_3;
-	private DefaultMutableTreeNode field_11;
-	private DefaultMutableTreeNode field_12;
-	private DefaultMutableTreeNode field_21;
-	private DefaultMutableTreeNode field_31;
-	private DefaultMutableTreeNode field_32;
-	private DefaultMutableTreeNode field_33;
+	private TreeComponent dbTree;
 	
 	private JButton btn1;
 	private JButton btn2;
@@ -53,18 +44,14 @@ public class DatabaseDetailPanel extends JPanel implements DatabasePanel {
 		centerPanel = new JPanel(new GridLayout(1, 1));
 		centerPanel.setBackground(Color.WHITE);
 		
-		root = new DefaultMutableTreeNode("Database");
-		table_1 = new DefaultMutableTreeNode("Table 1");
-		table_2 = new DefaultMutableTreeNode("Table 2");
-		table_3 = new DefaultMutableTreeNode("Table 3");
-		field_11 = new DefaultMutableTreeNode("Field 11");
-		field_12 = new DefaultMutableTreeNode("Field 12");
-		field_21 = new DefaultMutableTreeNode("Field 21");
-		field_31 = new DefaultMutableTreeNode("Field 31");
-		field_32 = new DefaultMutableTreeNode("Field 32");
-		field_33 = new DefaultMutableTreeNode("Field 33");
+		Vector<String> v1 = new TreeNodeVector<String>("TWO", new String[] {"e1", "e2", "e3"});
+		Vector<Object> v2 = new TreeNodeVector<Object>("THREE", new Object[] {"f1", "f2", "f3"});
+		v2.add(System.getProperties());
+		Object nodes[] = {v1, v2};
+		Vector<Object> v = new TreeNodeVector<Object>("ROOT", nodes);
+		Vector<Object> rootVector = new TreeNodeVector<Object>("ROOT", new Object[] {v});
 		
-		dbTree = new JTree(root);
+		dbTree = new TreeComponent(rootVector);
 		
 		btn1 = new JButton("One");
 		btn2 = new JButton("Two");
@@ -80,26 +67,7 @@ public class DatabaseDetailPanel extends JPanel implements DatabasePanel {
 		topPanel.add(btn3);
 		
 		//add to center panel
-		table_1.add(field_11);
-		table_1.add(field_12);
-		table_2.add(field_21);
-		table_3.add(field_31);
-		table_3.add(field_32);
-		table_3.add(field_33);
-		table_1.add(table_2);
-		table_2.add(table_3);
-		
-		DefaultMutableTreeNode table_4 = new DefaultMutableTreeNode("table 4");
-		DefaultMutableTreeNode table_5 = new DefaultMutableTreeNode("table 5");
-		DefaultMutableTreeNode table_6 = new DefaultMutableTreeNode("table 6");
-		DefaultMutableTreeNode table_7 = new DefaultMutableTreeNode("table 7");
-		table_3.add(table_4);
-		table_4.add(table_5);
-		table_5.add(table_6);
-		table_6.add(table_7);
-		root.add(table_1);
-		
-		centerPanel.add(dbTree);
+		centerPanel.add(new JScrollPane(dbTree));
 		
 		//add to main panel
 		add(topPanel, BorderLayout.NORTH);

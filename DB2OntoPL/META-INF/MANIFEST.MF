@@ -1,7 +1,7 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: DB2OntoPL plug-in
-Bundle-SymbolicName: dh.protege41.editor.owl.tab4;singleton:=true
+Bundle-SymbolicName: dh.protege41.db2onto;singleton:=true
 Bundle-Category: protege
 Bundle-ContactAddress: hongty.huynh@gmail.com
 Bundle-DocURL: http://protege.stanford.edu

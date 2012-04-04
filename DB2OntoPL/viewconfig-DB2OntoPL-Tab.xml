@@ -3,27 +3,27 @@
     <VSNode splits="0.3 0.7">
         <CNode>
             <Component label="Database Detail">
-                <Property id="pluginId" value="dh.protege41.editor.owl.tab4.DatabaseDetailViewComponent"/>
+                <Property id="pluginId" value="dh.protege41.db2onto.DatabaseDetailViewComponent"/>
             </Component>
 		    <Component label="Database Configure">
-                <Property id="pluginId" value="dh.protege41.editor.owl.tab4.DatabaseConfigureViewComponent"/>
+                <Property id="pluginId" value="dh.protege41.db2onto.DatabaseConfigureViewComponent"/>
             </Component>
         </CNode>
         <HSNode splits="0.375 0.625">
 	        <CNode>
 	            <Component label="Database Records View">
-	                <Property id="pluginId" value="dh.protege41.editor.owl.tab4.DatabaseRecordsViewComponent"/>
+	                <Property id="pluginId" value="dh.protege41.db2onto.DatabaseRecordsViewComponent"/>
 	            </Component>
 	        </CNode>
 	        <VSNode splits="0.5 0.5">
 		        <CNode>
 		            <Component label="Database Detail">
-		                <Property id="pluginId" value="dh.protege41.editor.owl.tab4.DatabaseDetailViewComponent"/>
+		                <Property id="pluginId" value="dh.protege41.db2onto.DatabaseDetailViewComponent"/>
 		            </Component>
 		        </CNode>
 		        <CNode>
 		            <Component label="Database Configure">
-		                <Property id="pluginId" value="dh.protege41.editor.owl.tab4.DatabaseConfigureViewComponent"/>
+		                <Property id="pluginId" value="dh.protege41.db2onto.DatabaseConfigureViewComponent"/>
 		            </Component>
 		        </CNode>
 	        </VSNode>

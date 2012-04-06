@@ -11,6 +11,7 @@ import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 
+import dh.database.api.DBType;
 import dh.protege41.db2onto.tab.ui.util.JTreeComponent;
 import dh.protege41.db2onto.tab.ui.util.JTreeNodeVector;
 
@@ -33,6 +34,7 @@ public class DatabaseDetailPanel extends JPanel implements DatabasePanel {
 	public DatabaseDetailPanel() {
 		initComponents();
 		attachComponents();
+		initEventListeners();
 	}
 	
 	
@@ -52,6 +54,7 @@ public class DatabaseDetailPanel extends JPanel implements DatabasePanel {
 		Vector<Object> rootVector = new JTreeNodeVector<Object>("ROOT", new Object[] {v});
 		
 		dbTree = new JTreeComponent(rootVector);
+		
 		
 		btn1 = new JButton("One");
 		btn2 = new JButton("Two");
@@ -88,6 +91,12 @@ public class DatabaseDetailPanel extends JPanel implements DatabasePanel {
 		
 	}
 	
+	public void setDBTree(JTreeComponent newTree) {
+		dbTree = newTree;
+	}
+	public JTreeComponent getDBTree() {
+		return dbTree;
+	}
 //	public static void main(String args[]) {
 //		JFrame frame = new JFrame("Design Test");
 //		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);

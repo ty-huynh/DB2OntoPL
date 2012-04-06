@@ -7,7 +7,7 @@ import org.protege.editor.owl.ui.view.AbstractOWLViewComponent;
 
 import dh.protege41.db2onto.tab.ui.DatabaseRecordsPanel;
 
-public class DatabaseRecordsViewComponent extends AbstractOWLViewComponent{
+public class DatabaseRecordsViewComponent extends DatabaseViewComponent{
 	/**
 	 * 
 	 */

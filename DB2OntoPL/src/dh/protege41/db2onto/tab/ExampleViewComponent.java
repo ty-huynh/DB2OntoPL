@@ -8,7 +8,7 @@ import org.protege.editor.owl.ui.view.AbstractOWLViewComponent;
 import dh.protege41.owl.Metrics;
 
 
-public class ExampleViewComponent extends AbstractOWLViewComponent {
+public class ExampleViewComponent extends DatabaseViewComponent {
     private static final long serialVersionUID = -4515710047558710080L;
     
     private static final Logger log = Logger.getLogger(ExampleViewComponent.class);

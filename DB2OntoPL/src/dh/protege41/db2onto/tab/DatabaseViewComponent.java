@@ -16,8 +16,6 @@ public class DatabaseViewComponent extends AbstractOWLViewComponent{
 
 	private static final Logger log = Logger.getLogger(DatabaseViewComponent.class);
 	
-	private DatabaseTabbed databaseTabbedComponent;
-	
 	@Override
 	protected void disposeOWLView() {
 		// TODO Auto-generated method stub
@@ -27,10 +25,7 @@ public class DatabaseViewComponent extends AbstractOWLViewComponent{
 	@Override
 	protected void initialiseOWLView() throws Exception {
 		// TODO Auto-generated method stub
-		setLayout(new BorderLayout());
-		databaseTabbedComponent = new DatabaseTabbed();
-		add(databaseTabbedComponent, BorderLayout.CENTER);
-		log.info("Database view component initialized!");
+		DB2OntoPLWorkspaceTab.hello();
 	}
 
 }

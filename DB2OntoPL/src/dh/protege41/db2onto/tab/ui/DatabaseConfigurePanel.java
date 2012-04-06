@@ -34,14 +34,6 @@ public class DatabaseConfigurePanel extends JPanel implements DatabasePanel {
 	private JPanel panelCenter;
 	private JPanel panelBottom;
 	
-//	private JLabel lbDataType;
-//	private JLabel lbDriver;
-//	private JLabel lbDBName;
-//	private JLabel lbHost;
-//	private JLabel lbPort;
-//	private JLabel lbUsername;
-//	private JLabel lbPassword;
-	
 	private JComboBox cbbDBType;
 	
 	private JTextField tfDriver;
@@ -59,8 +51,6 @@ public class DatabaseConfigurePanel extends JPanel implements DatabasePanel {
 	private final String[] dbDrivers = {DBDriver.MSACCESS, DBDriver.SQLSERVER};
 	
 	public DatabaseConfigurePanel() {
-//		setLayout(new FlowLayout(FlowLayout.CENTER));
-//		add(new JButton("This is database configure form"));
 		initComponents();
 		attachComponents();
 		initEventListeners();

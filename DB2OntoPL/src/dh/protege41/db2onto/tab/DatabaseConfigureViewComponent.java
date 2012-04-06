@@ -7,7 +7,7 @@ import org.protege.editor.owl.ui.view.AbstractOWLViewComponent;
 
 import dh.protege41.db2onto.tab.ui.DatabaseConfigurePanel;
 
-public class DatabaseConfigureViewComponent extends AbstractOWLViewComponent{
+public class DatabaseConfigureViewComponent extends DatabaseViewComponent {
 	/**
 	 * 
 	 */
@@ -23,6 +23,7 @@ public class DatabaseConfigureViewComponent extends AbstractOWLViewComponent{
 		
 	}
 
+	@SuppressWarnings("deprecation")
 	@Override
 	protected void initialiseOWLView() throws Exception {
 		// TODO Auto-generated method stub
@@ -30,5 +31,6 @@ public class DatabaseConfigureViewComponent extends AbstractOWLViewComponent{
 		databaseConfigureComponent = new DatabaseConfigurePanel();
 		add(databaseConfigureComponent, BorderLayout.CENTER);
 		log.info("database configure view component initialized!");
+		DB2OntoPLWorkspaceTab.hello();
 	}
 }

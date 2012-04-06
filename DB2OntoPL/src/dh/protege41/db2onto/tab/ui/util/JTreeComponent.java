@@ -37,23 +37,10 @@ public class JTreeComponent extends JTree {
 		return this;
 	}
 	
-//	//vector to tree
-//	@SuppressWarnings("unchecked")
-//	public static DefaultMutableTreeNode processHierarchy(Vector<Object> nodes) {
-//		DefaultMutableTreeNode root = new DefaultMutableTreeNode(nodes.get(0));
-//		log.info("root: " + root);
-//		DefaultMutableTreeNode child;
-//		for(Object obj : nodes ) {
-//			if(obj instanceof Vector) {
-//				child = processHierarchy((Vector<Object>)obj); //node have children
-//			} else {
-//				child = new DefaultMutableTreeNode(obj); //leaf
-//				log.info("child: " + child);
-//			}
-//			root.add(child);
-//		}
-//		return root;
-//	}
+	public void clear() {
+		removeAll();
+	}
+	
 }
 
 

@@ -48,12 +48,12 @@
    
    <!-- Main workspace tab -->
    <extension
-         id="MainWorkspaceTab"
+         id="DB2OntoPLWorkspaceTab"
          name="Main Workspace Tab"
          point="org.protege.editor.core.application.WorkspaceTab">
       <label value="DB2OntoPL"></label>
-      <class value="dh.protege41.db2onto.tab.MainWorkspaceTab"></class>
-      <index value="X"></index>
+      <class value="dh.protege41.db2onto.tab.DB2OntoPLWorkspaceTab"></class>
+      <index value="DH"></index>
       <editorKitId value="OWLEditorKit"></editorKitId>
       <defaultViewConfigFileName value="viewconfig-DB2OntoPL-Tab.xml">
       </defaultViewConfigFileName>

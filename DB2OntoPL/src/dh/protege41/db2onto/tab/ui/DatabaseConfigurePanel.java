@@ -46,7 +46,9 @@ public class DatabaseConfigurePanel extends JPanel implements DatabasePanel {
 	private JButton btnChange;
 	private JButton btnLoad;
 	private JButton btnCancel;
-	
+	public JButton getJButtonChange() {
+		return btnChange;
+	}
 	private final String[] dbTypes = {DBType.MSACCESS, DBType.SQLSERVER};
 	private final String[] dbDrivers = {DBDriver.MSACCESS, DBDriver.SQLSERVER};
 	

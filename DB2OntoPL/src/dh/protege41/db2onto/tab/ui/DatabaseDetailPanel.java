@@ -108,4 +108,11 @@ public class DatabaseDetailPanel extends JPanel implements DatabasePanel {
 //		frame.setSize(400, 250);
 //		frame.setVisible(true);
 //	}
+
+
+	@Override
+	public void handleEvents(String event) {
+		// TODO Auto-generated method stub
+		
+	}
 }

@@ -4,6 +4,7 @@ import org.apache.log4j.Logger;
 import org.protege.editor.owl.ui.OWLWorkspaceViewsTab;
 
 import dh.protege41.db2onto.event.dbobject.DBObjectEventManager;
+import dh.protege41.db2onto.event.dboperation.DBOperationEventManager;
 
 public class DB2OntoPLWorkspaceTab extends OWLWorkspaceViewsTab{
 
@@ -22,10 +23,15 @@ public class DB2OntoPLWorkspaceTab extends OWLWorkspaceViewsTab{
 	// - event is DBSelectionChanged
 	// - listener is DBSelectionListener
 	// - in each ViewComponent declare a method that handle DBSelectionChanged event
-	private static DBObjectEventManager _eventManager = new DBObjectEventManager();
+	private static DBObjectEventManager _dbObjectEventManager = new DBObjectEventManager();
+	private static DBOperationEventManager _dbOperationEventManager = new DBOperationEventManager();
 	
-	public static DBObjectEventManager getEventManager() {
-		return _eventManager;
+	public static DBObjectEventManager getDBObjectEventManager() {
+		return _dbObjectEventManager;
+	}
+	
+	public static DBOperationEventManager getDBOperationEventManager() {
+		return _dbOperationEventManager;
 	}
 	
 	public static void hello() {

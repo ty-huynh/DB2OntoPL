@@ -4,14 +4,18 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
+import org.apache.log4j.Logger;
+
 public class DBOperationEventManager {
 	
 	private DBOperationObject _dbOperation;
 	private List<DBOperationEventListener> _listeners = new ArrayList<DBOperationEventListener>();
+	private static final Logger log = Logger.getLogger(DBOperationEventManager.class);
 	
 	public synchronized void selectOperation(DBOperationObject dbOperation) {
 		_dbOperation = dbOperation;
 		_fireOperationEvent();
+		log.info("operation selected");
 	}
 	
 	public synchronized void addDBOperationListener(DBOperationEventListener listener) {
@@ -28,5 +32,6 @@ public class DBOperationEventManager {
 		while(iterator.hasNext()) {
 			iterator.next().dbOperationPerformed(dbOperEvent);
 		}
+		log.info("operation fire to " + _listeners.size() + " listener(s)");
 	}
 }

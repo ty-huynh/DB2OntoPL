@@ -149,6 +149,7 @@ public class DatabaseConfigurePanel extends JPanel implements DatabasePanel {
 	}
 	
 
+	private boolean _done = false;
 	@Override
 	public void handleEvents(int event) {
 		// TODO Auto-generated method stub
@@ -161,16 +162,33 @@ public class DatabaseConfigurePanel extends JPanel implements DatabasePanel {
 					
 					@Override
 					public void run() {
+						_done = false;
 						// TODO Auto-generated method stub
-						loadDatabase();
+						while(!_done) {
+							try{
+								loadDatabase();
+							} catch(Exception e) {
+								if(!_done) {
+									try {
+										log.info("Try connect to database after 5 seconds");
+										log.info("Press cancel to abort this connection");
+										synchronized (this) {
+											this.wait(5 * 1000L);
+										};
+									} catch (InterruptedException ee) {
+										// TODO Auto-generated catch block
+										ee.printStackTrace();
+									}
+								}
+							}
+						}
+						return;
 					}
 				});
 				thread.start();
-				
-				
 			}; break;
 			case DatabasePanel.DB_EVENT_CANCEL : {
-				
+				_done = true;
 			}; break;
 			case DatabasePanel.DB_EVENT_DBTYPE_CHANGED : {
 //				putMessages("Selected " + cbbDBType.getSelectedItem());
@@ -197,23 +215,31 @@ public class DatabaseConfigurePanel extends JPanel implements DatabasePanel {
 		test.DatabaseConnectionTest(driver, databaseName, url, user, pass);
 		try {
 			test.ExeTest();
+			_done = true;
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+		
+	}
+
+	@Override
+	public void handleEvents(String event) {
+		// TODO Auto-generated method stub
+		
 	}
 	
-//	public static void main(String args[]) {
-//		JFrame frame = new JFrame("Design Test");
-//		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-//		
-//		DatabaseConfigurePanel main = new DatabaseConfigurePanel();
-//		
-//		frame.add(main);
-//		
-//		frame.setSize(400, 600);
-//		frame.setVisible(true);
-//	}
+	public static void main(String args[]) {
+		JFrame frame = new JFrame("Design Test");
+		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		
+		DatabaseConfigurePanel main = new DatabaseConfigurePanel();
+		
+		frame.add(main);
+		
+		frame.setSize(400, 600);
+		frame.setVisible(true);
+	}
 
 	
 

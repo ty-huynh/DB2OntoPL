@@ -5,6 +5,8 @@ import java.awt.BorderLayout;
 import org.apache.log4j.Logger;
 import org.protege.editor.owl.ui.view.AbstractOWLViewComponent;
 
+import dh.protege41.db2onto.event.dbobject.DBObject;
+import dh.protege41.db2onto.event.dboperation.DBOperationObject;
 import dh.protege41.owl.Metrics;
 
 
@@ -27,4 +29,17 @@ public class ExampleViewComponent extends DatabaseViewComponent {
         log.info("Example View Component initialized");
     }
 
+	@Override
+	protected DBObject updateView() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	protected DBOperationObject performOperation() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+    
 }

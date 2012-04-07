@@ -4,12 +4,17 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.FlowLayout;
 import java.awt.GridLayout;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Vector;
 
 import javax.swing.JButton;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.event.TreeModelListener;
+import javax.swing.event.TreeSelectionEvent;
+import javax.swing.event.TreeSelectionListener;
+import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.TreeModel;
 import javax.swing.tree.TreePath;
 
@@ -17,12 +22,18 @@ import org.apache.log4j.Logger;
 
 import dh.database.api.DBOperationImplement;
 import dh.protege41.db2onto.event.dbobject.DBObject;
+import dh.protege41.db2onto.event.dbobject.DBObjectColumn;
+import dh.protege41.db2onto.event.dbobject.DBObjectDatabase;
+import dh.protege41.db2onto.event.dbobject.DBObjectTable;
 import dh.protege41.db2onto.event.dboperation.DBOperationEventType;
 import dh.protege41.db2onto.event.dboperation.DBOperationObject;
 import dh.protege41.db2onto.tab.ui.DatabasePanel;
+import dh.protege41.db2onto.tab.ui.util.DBTreeNode;
 import dh.protege41.db2onto.tab.ui.util.JTreeComponent;
 import dh.protege41.db2onto.tab.ui.util.JTreeNodeVector;
 import java.sql.DatabaseMetaData;
+import java.sql.ResultSet;
+import java.sql.ResultSetMetaData;
 
 public class DatabaseDetailViewComponent extends DatabaseViewComponent {
 
@@ -83,6 +94,8 @@ public class DatabaseDetailViewComponent extends DatabaseViewComponent {
 		private JButton btn1;
 		private JButton btn2;
 		private JButton btn3;
+		
+		private TreeSelectionListener treeSelectionListener;
 		
 		public DatabaseDetailPanel() {
 			initComponents();
@@ -151,21 +164,40 @@ public class DatabaseDetailViewComponent extends DatabaseViewComponent {
 		public void buildDatabaseTree() {
 			try {
 				DatabaseMetaData meta = dbOperationImpl.getDatabaseMetaData();
-//				centerPanel.setVisible(false);
 				centerPanel.remove(scroll);
-				
-				
-				Vector<Object> table1 = new JTreeNodeVector<Object>(new DBObject("table1"), new Object[] {new DBObject(), new DBObject()});
-				Vector<Object> table2 = new JTreeNodeVector<Object>(new DBObject("table1"), new Object[] {new DBObject(), new DBObject()});
-				Object nodes[] = {table1, table1};
-				Vector<Object> v = new JTreeNodeVector<Object>("ROOT", nodes);
-				Vector<Object> rootVector = new JTreeNodeVector<Object>("ROOT", new Object[] {v});
-				
+				DBTreeNode root = new DBTreeNode(new DBObjectDatabase(
+						meta.getDatabaseProductName(),
+						meta.getDatabaseProductName(),
+						meta.getDatabaseProductVersion(),
+						meta.getDriverName(),
+						meta.getDriverVersion(),
+						meta.getURL(),
+						meta.getUserName(),
+						meta.isReadOnly()));
+				ResultSet rsTables = dbOperationImpl.getTables();
+				while(rsTables.next()) {
+					String tableName = rsTables.getString(DBObjectTable.TABLE_NAME);
+					String tableCat = rsTables.getString(DBObjectTable.TABLE_CAT);
+					String tableSchem = rsTables.getString(DBObjectTable.TABLE_SCHEM);
+					String tableType = rsTables.getString(DBObjectTable.TABLE_TYPE);
+					DBTreeNode tableNode = new DBTreeNode(new DBObjectTable(tableName, tableCat, tableSchem, tableType));
+					ResultSet rsColumns = dbOperationImpl.getColumns(tableName);
+					while(rsColumns.next()) {
+						tableNode.add(new DBTreeNode(new DBObjectColumn(
+								rsColumns.getString(DBObjectColumn.COLUMN_NAME),
+								rsColumns.getString(DBObjectColumn.DATA_TYPE),
+								rsColumns.getString(DBObjectColumn.TYPE_NAME),
+								rsColumns.getString(DBObjectColumn.COLUMN_SIZE),
+								rsColumns.getString(DBObjectColumn.NULLABLE))));
+					}
+					root.add(tableNode);
+				}
+				dbTree.removeTreeSelectionListener(treeSelectionListener);
 				dbTree.clear();
-				dbTree = new JTreeComponent(rootVector);
+				dbTree = new JTreeComponent(root);
+				_initTreeSelectionEventHandler();
 				scroll = new JScrollPane(dbTree);
 				centerPanel.add(scroll);
-				
 				centerPanel.revalidate();
 				centerPanel.repaint();
 //				
@@ -174,9 +206,36 @@ public class DatabaseDetailViewComponent extends DatabaseViewComponent {
 //				centerPanel.setVisible(true);
 				
 			} catch (Exception e) {
+				e.printStackTrace();
 				log.info("Build database tree error");
 			}
 			
+		}
+		
+		private void _initTreeSelectionEventHandler() {
+			treeSelectionListener = new TreeSelectionListener() {
+				
+				@Override
+				public void valueChanged(TreeSelectionEvent event) {
+					// TODO Auto-generated method stub
+					//get all nodes whose selection status has changed
+					TreePath[] paths = event.getPaths();
+					//
+					for(TreePath obj : paths) {
+						if(event.isAddedPath(obj)) {
+							DefaultMutableTreeNode node = (DefaultMutableTreeNode) obj.getLastPathComponent();
+							log.info(((DBObject)node.getUserObject()).getType());
+						
+						} else {
+							DefaultMutableTreeNode node = (DefaultMutableTreeNode) obj.getLastPathComponent();
+							log.info(((DBObject)node.getUserObject()).getName());
+						}
+					}
+					
+				}
+			};
+			dbTree.addTreeSelectionListener(treeSelectionListener);
+			log.info("setup listener for tree selection event");
 		}
 		
 		public void setDBTree(JTreeComponent newTree) {

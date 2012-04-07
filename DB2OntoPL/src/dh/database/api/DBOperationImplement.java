@@ -59,7 +59,7 @@ public class DBOperationImplement implements DBOperation {
 		if(conn == null) {
 			createConnection();
 		}
-		return conn.createStatement();
+		return conn.createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_READ_ONLY);
 	}
 
 	@Override
@@ -99,10 +99,31 @@ public class DBOperationImplement implements DBOperation {
 		ResultSet rs = null;
 		try {
 			rs = getDatabaseMetaData().getTables(null, null, "%", new String[] {"TABLE"});
-			log.info("Get table ok");
+			log.info("Get table done");
 		} catch (SQLException e) {
 			log.info("Get table error");
 		}
 		return rs;
+	}
+	public ResultSet getColumns(String table) throws Exception {
+		ResultSet rs = null;
+		try{
+			rs = getDatabaseMetaData().getColumns(null, null, table, "%");
+			log.info("Get columns done");
+		} catch(SQLException e) {
+			log.info("Get columns error");
+		}
+		return rs;
+	}
+	public int getResultSetSize(ResultSet rs) {
+		int count = 0;
+		try {
+			while(rs.next()) {
+				count++;
+			}
+		} catch (SQLException e) {
+			log.info("get size of resultset error");
+		}
+		return count;
 	}
 }

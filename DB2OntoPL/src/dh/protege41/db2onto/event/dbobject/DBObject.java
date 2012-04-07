@@ -1,6 +1,10 @@
 package dh.protege41.db2onto.event.dbobject;
 
+import org.apache.log4j.Logger;
+
 public class DBObject {
+	protected static final Logger log = Logger.getLogger(DBObject.class);
+	
 	private String _type;
 	private String _name;
 	

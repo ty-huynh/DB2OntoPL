@@ -1,11 +1,14 @@
 package dh.database.api;
 
 import java.sql.Connection;
+import java.sql.DatabaseMetaData;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 
 import org.apache.log4j.Logger;
+
+import dh.database.api.exception.DHConnectionException;
 
 public class DBOperationImplement implements DBOperation {
 
@@ -26,18 +29,15 @@ public class DBOperationImplement implements DBOperation {
 	}
 
 	@Override
-	public Connection createConnection() throws SQLException {
+	public Connection createConnection() throws DHConnectionException {
 		// TODO Auto-generated method stub
 		if(conn != null) {
 			conn = null;
 		}
 		try {
 			this.conn = dbConnection.connect();
-			System.out.println("connected");
 		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			//e.printStackTrace();
-			System.out.println("connection error");
+			throw new DHConnectionException("connection failure");
 		}
 		return conn;
 	}
@@ -54,7 +54,7 @@ public class DBOperationImplement implements DBOperation {
 	}
 
 	@Override
-	public Statement getStatement() throws SQLException {
+	public Statement getStatement() throws Exception {
 		// TODO Auto-generated method stub
 		if(conn == null) {
 			createConnection();
@@ -63,7 +63,7 @@ public class DBOperationImplement implements DBOperation {
 	}
 
 	@Override
-	public ResultSet exeQuery(String query) throws SQLException {
+	public ResultSet exeQuery(String query) throws Exception {
 		// TODO Auto-generated method stub
 		if(conn == null) {
 			createConnection();
@@ -72,7 +72,7 @@ public class DBOperationImplement implements DBOperation {
 	}
 
 	@Override
-	public boolean exeUpdate(String sql) throws SQLException {
+	public boolean exeUpdate(String sql) throws Exception {
 		// TODO Auto-generated method stub
 		if(conn == null) {
 			createConnection();
@@ -88,4 +88,21 @@ public class DBOperationImplement implements DBOperation {
 		this.dbConnection = dbConnection;
 	}
 
+	//get metadata
+	public DatabaseMetaData getDatabaseMetaData() throws Exception {
+		if(conn == null) {
+			createConnection();
+		}
+		return conn.getMetaData();
+	}
+	public ResultSet getTables() throws Exception {
+		ResultSet rs = null;
+		try {
+			rs = getDatabaseMetaData().getTables(null, null, "%", new String[] {"TABLE"});
+			log.info("Get table ok");
+		} catch (SQLException e) {
+			log.info("Get table error");
+		}
+		return rs;
+	}
 }

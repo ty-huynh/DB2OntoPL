@@ -17,20 +17,18 @@ import javax.swing.JTextField;
 
 import org.apache.log4j.Logger;
 
-import sun.awt.windows.ThemeReader;
+import dh.database.api.DBEnumType;
+import dh.database.api.DBOperationImplement;
+import dh.protege41.db2onto.event.dboperation.DBOperationEventType;
+import dh.protege41.db2onto.tab.DB2OntoPLWorkspaceTab;
 
-import dh.database.api.DBDriver;
-import dh.database.api.DBType;
-import dh.database.api.TestConnection;
-
-public class DatabaseConfigurePanel extends JPanel implements DatabasePanel {
+class DatabaseConfigurePanel extends JPanel implements DatabasePanel {
 
 	/**
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
 	private static final Logger log = Logger.getLogger(DatabaseConfigurePanel.class);
-	
 	private JPanel panelCenter;
 	private JPanel panelBottom;
 	
@@ -46,11 +44,6 @@ public class DatabaseConfigurePanel extends JPanel implements DatabasePanel {
 	private JButton btnChange;
 	private JButton btnLoad;
 	private JButton btnCancel;
-	public JButton getJButtonChange() {
-		return btnChange;
-	}
-	private final String[] dbTypes = {DBType.MSACCESS, DBType.SQLSERVER};
-	private final String[] dbDrivers = {DBDriver.MSACCESS, DBDriver.SQLSERVER};
 	
 	public DatabaseConfigurePanel() {
 		initComponents();
@@ -63,10 +56,10 @@ public class DatabaseConfigurePanel extends JPanel implements DatabasePanel {
 		panelCenter = new JPanel(new GridLayout(14, 0, 5, 5));
 		panelBottom = new JPanel(new FlowLayout(FlowLayout.CENTER));
 		
-		cbbDBType = new JComboBox(dbTypes);
+		cbbDBType = new JComboBox(DBEnumType.getAllDBTypes());
 		cbbDBType.setSelectedIndex(0);
 		
-		tfDriver = new JTextField(dbDrivers[cbbDBType.getSelectedIndex()], 30);
+		tfDriver = new JTextField(DBEnumType.getDBEnumByType((String)cbbDBType.getSelectedItem()).getDriver(), 30);
 		
 		tfDBName = new JTextField(30);
 		tfHost = new JTextField(30);
@@ -116,7 +109,7 @@ public class DatabaseConfigurePanel extends JPanel implements DatabasePanel {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				// TODO Auto-generated method stub
-				handleEvents(DatabasePanel.DB_EVENT_DBTYPE_CHANGED);
+				tfDriver.setText(DBEnumType.getDBEnumByType((String)cbbDBType.getSelectedItem()).getDriver());
 			}
 		});
 		
@@ -125,7 +118,8 @@ public class DatabaseConfigurePanel extends JPanel implements DatabasePanel {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				// TODO Auto-generated method stub
-				handleEvents(DatabasePanel.DB_EVENT_CHANGE);
+//				handleEvents(DBOperationEventType.DB_OPERATION_CHANGE);
+//				DatabaseConfigureViewComponent.setGlobalDBOperationOBject(new DBOperationObject(DBOperationEventType.DB_OPERATION_CHANGE));
 			}
 		});
 		
@@ -134,7 +128,7 @@ public class DatabaseConfigurePanel extends JPanel implements DatabasePanel {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				// TODO Auto-generated method stub
-				handleEvents(DatabasePanel.DB_EVENT_LOAD);
+				handleEvents(DBOperationEventType.DB_OPERATION_LOADING);
 			}
 		});
 		
@@ -143,58 +137,27 @@ public class DatabaseConfigurePanel extends JPanel implements DatabasePanel {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				// TODO Auto-generated method stub
-				handleEvents(DatabasePanel.DB_EVENT_CANCEL);
+				handleEvents(DBOperationEventType.DB_OPERATION_CANCEL);
 			}
 		});
 	}
 	
 
-	private boolean _done = false;
 	@Override
-	public void handleEvents(int event) {
+	public void handleEvents(String event) {
 		// TODO Auto-generated method stub
-		switch(event) {
-			case DatabasePanel.DB_EVENT_CHANGE : {
+		if(event.equals(DBOperationEventType.DB_OPERATION_LOADING)) {
+			Thread t = new Thread(new Runnable() {
 				
-			}; break;
-			case DatabasePanel.DB_EVENT_LOAD : {
-				Thread thread = new Thread(new Runnable() {
-					
-					@Override
-					public void run() {
-						_done = false;
-						// TODO Auto-generated method stub
-						while(!_done) {
-							try{
-								loadDatabase();
-							} catch(Exception e) {
-								if(!_done) {
-									try {
-										log.info("Try connect to database after 5 seconds");
-										log.info("Press cancel to abort this connection");
-										synchronized (this) {
-											this.wait(5 * 1000L);
-										};
-									} catch (InterruptedException ee) {
-										// TODO Auto-generated catch block
-										ee.printStackTrace();
-									}
-								}
-							}
-						}
-						return;
-					}
-				});
-				thread.start();
-			}; break;
-			case DatabasePanel.DB_EVENT_CANCEL : {
-				_done = true;
-			}; break;
-			case DatabasePanel.DB_EVENT_DBTYPE_CHANGED : {
-//				putMessages("Selected " + cbbDBType.getSelectedItem());
-				tfDriver.setText(dbDrivers[cbbDBType.getSelectedIndex()]);
-			}; break;
+				@Override
+				public void run() {
+					// TODO Auto-generated method stub
+					loadDatabase();
+				}
+			});
+			t.start();
 		}
+		
 //		putMessages("Event " + event);
 	}
 	
@@ -204,27 +167,42 @@ public class DatabaseConfigurePanel extends JPanel implements DatabasePanel {
 	
 	//should use connection pooler
 	public void loadDatabase() {
+		log.info("loading database");
+		String dbType = (String)cbbDBType.getSelectedItem();
 		String driver = tfDriver.getText().trim();
 		String databaseName = tfDBName.getText().trim();
-		String url = "jdbc:sqlserver://" + tfHost.getText().trim() + ":" + tfPort.getText().trim() + ";databaseName=" + databaseName + ";selectMethod=cursor";
 		String user = tfUsername.getText().trim();
 		String pass = tfPassword.getText().trim();
 		
-		log.info(driver + ", " + url + ", " + user + ", " + pass);
-		TestConnection test = new TestConnection();
-		test.DatabaseConnectionTest(driver, databaseName, url, user, pass);
+		String url = "";
+		if(dbType.equalsIgnoreCase(DBEnumType.MSACCESS.getType())) {
+			url = "jdbc:odbc:Driver={Microsoft Access Driver (*.mdb)};DBQ=" + databaseName;
+		} else if(dbType.equalsIgnoreCase(DBEnumType.SQLSERVER.getType())) {
+			url = "jdbc:sqlserver://" + tfHost.getText().trim() + ":" + tfPort.getText().trim() + ";databaseName=" + databaseName + ";selectMethod=cursor";
+		}
+		log.info("dirver = " + driver + ", url = " + url);
+		
 		try {
-			test.ExeTest();
-			_done = true;
-		} catch (SQLException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			new DBOperationImplement(driver, url, databaseName, user, pass).createConnection();
+			log.info("loaded successfully");
+		} catch (Exception e) {
+			log.info("loaded failed");
 		}
 		
+//		if(DB2OntoPLWorkspaceTab.getDBOperationImplement() != null) {
+//			try {
+//				DB2OntoPLWorkspaceTab.getDBOperationImplement().close();
+//			} catch (SQLException e) {
+//				// TODO Auto-generated catch block
+//				log.info("can not close connection");
+//			}
+//			DB2OntoPLWorkspaceTab.setDBOperationImplement(null);
+//		}
+//		DB2OntoPLWorkspaceTab.setDBOperationImplement(new DBOperationImplement(driver, url, databaseName, user, pass));
 	}
 
 	@Override
-	public void handleEvents(String event) {
+	public void handleEvents(int event) {
 		// TODO Auto-generated method stub
 		
 	}
@@ -240,8 +218,4 @@ public class DatabaseConfigurePanel extends JPanel implements DatabasePanel {
 		frame.setSize(400, 600);
 		frame.setVisible(true);
 	}
-
-	
-
-	
 }

@@ -8,20 +8,20 @@ public class JTreeNodeVector<E> extends Vector<E> {
 	 */
 	private static final long serialVersionUID = 1L;
 	
-	String name;
+	Object _node;
 	
-	public JTreeNodeVector(String name) {
-		this.name = name;
+	public JTreeNodeVector(Object node) {
+		this._node = node;
 	}
 	
-	public JTreeNodeVector(String name, E elements[]) {
-		this.name = name;
+	public JTreeNodeVector(Object node, E elements[]) {
+		this._node = node;
 		for(int i = 0; i < elements.length; i++) {
 			add(elements[i]);
 		}
 	}
 	
 	public String toString() {
-		return "[" + name + "]";
+		return "[" + _node + "]";
 	}
 }

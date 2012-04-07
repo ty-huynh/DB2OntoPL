@@ -7,8 +7,8 @@ import java.sql.Statement;
 
 public interface DBOperation {
 	public Connection createConnection() throws Exception;
-	public void close() throws SQLException;
-	public Statement getStatement() throws SQLException;
-	public ResultSet exeQuery(String query) throws SQLException;
-	public boolean exeUpdate(String sql) throws SQLException;
+	public void close() throws Exception;
+	public Statement getStatement() throws Exception;
+	public ResultSet exeQuery(String query) throws Exception;
+	public boolean exeUpdate(String sql) throws Exception;
 }

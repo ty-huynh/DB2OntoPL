@@ -9,23 +9,20 @@ import java.sql.SQLException;
 
 import javax.swing.JButton;
 import javax.swing.JComboBox;
+import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 
 import org.apache.log4j.Logger;
-import org.protege.editor.owl.ui.view.AbstractOWLViewComponent;
 
-import dh.database.api.DBDriver;
-import dh.database.api.DBType;
-import dh.database.api.TestConnection;
-import dh.protege41.db2onto.event.dbobject.DBObjectEvent;
-import dh.protege41.db2onto.event.dbobject.DBObjectEventListener;
+import dh.database.api.DBEnumType;
+import dh.database.api.DBOperationImplement;
+import dh.database.api.exception.DHConnectionException;
 import dh.protege41.db2onto.event.dbobject.DBObject;
 import dh.protege41.db2onto.event.dboperation.DBOperationEventType;
 import dh.protege41.db2onto.event.dboperation.DBOperationObject;
-import dh.protege41.db2onto.tab.ui.DatabaseConfigurePanel;
 import dh.protege41.db2onto.tab.ui.DatabasePanel;
 
 public class DatabaseConfigureViewComponent extends DatabaseViewComponent {
@@ -37,6 +34,7 @@ public class DatabaseConfigureViewComponent extends DatabaseViewComponent {
 	private final static Logger log = Logger.getLogger(DatabaseConfigureViewComponent.class);
 	
 	private DatabaseConfigurePanel databaseConfigureComponent;
+	private boolean connected = false;
 	
 	@Override
 	protected void disposeOWLView() {
@@ -88,11 +86,8 @@ public class DatabaseConfigureViewComponent extends DatabaseViewComponent {
 		private JTextField tfPassword;
 		
 		private JButton btnChange;
-		private JButton btnLoad;
+		private JButton btnConnect;
 		private JButton btnCancel;
-		
-		private final String[] dbTypes = {DBType.MSACCESS, DBType.SQLSERVER};
-		private final String[] dbDrivers = {DBDriver.MSACCESS, DBDriver.SQLSERVER};
 		
 		public DatabaseConfigurePanel() {
 			initComponents();
@@ -105,19 +100,19 @@ public class DatabaseConfigureViewComponent extends DatabaseViewComponent {
 			panelCenter = new JPanel(new GridLayout(14, 0, 5, 5));
 			panelBottom = new JPanel(new FlowLayout(FlowLayout.CENTER));
 			
-			cbbDBType = new JComboBox(dbTypes);
+			cbbDBType = new JComboBox(DBEnumType.getAllDBTypes());
 			cbbDBType.setSelectedIndex(0);
 			
-			tfDriver = new JTextField(dbDrivers[cbbDBType.getSelectedIndex()], 30);
+			tfDriver = new JTextField(DBEnumType.getDBEnumByType((String)cbbDBType.getSelectedItem()).getDriver(), 30);
 			
-			tfDBName = new JTextField(30);
-			tfHost = new JTextField(30);
-			tfPort = new JTextField(30);
-			tfUsername = new JTextField(30);
-			tfPassword = new JTextField(30);
+			tfDBName = new JTextField("DBTest", 30);
+			tfHost = new JTextField("localhost", 30);
+			tfPort = new JTextField("1433", 30);
+			tfUsername = new JTextField("sa", 30);
+			tfPassword = new JTextField("12345", 30);
 			
 			btnChange = new JButton("Change");
-			btnLoad = new JButton("Load");
+			btnConnect = new JButton("Connect");
 			btnCancel = new JButton("Cancel");
 		}
 		
@@ -140,7 +135,7 @@ public class DatabaseConfigureViewComponent extends DatabaseViewComponent {
 			
 			//attach components to bottom panel
 			panelBottom.add(btnChange);
-			panelBottom.add(btnLoad);
+			panelBottom.add(btnConnect);
 			panelBottom.add(btnCancel);
 			
 			//attach components to main panel
@@ -158,7 +153,7 @@ public class DatabaseConfigureViewComponent extends DatabaseViewComponent {
 				@Override
 				public void actionPerformed(ActionEvent e) {
 					// TODO Auto-generated method stub
-					
+					tfDriver.setText(DBEnumType.getDBEnumByType((String)cbbDBType.getSelectedItem()).getDriver());
 				}
 			});
 			
@@ -172,12 +167,12 @@ public class DatabaseConfigureViewComponent extends DatabaseViewComponent {
 				}
 			});
 			
-			btnLoad.addActionListener(new ActionListener() {
+			btnConnect.addActionListener(new ActionListener() {
 				
 				@Override
 				public void actionPerformed(ActionEvent e) {
 					// TODO Auto-generated method stub
-					handleEvents(DBOperationEventType.DB_OPERATION_LOADING);
+					handleEvents(DBOperationEventType.DB_OPERATION_CONNECT);
 				}
 			});
 			
@@ -195,6 +190,17 @@ public class DatabaseConfigureViewComponent extends DatabaseViewComponent {
 		@Override
 		public void handleEvents(String event) {
 			// TODO Auto-generated method stub
+			if(event.equals(DBOperationEventType.DB_OPERATION_CONNECT)) {
+				Thread t = new Thread(new Runnable() {
+					
+					@Override
+					public void run() {
+						// TODO Auto-generated method stub
+						setupConnectionDatabase();
+					}
+				});
+				t.start();
+			}
 			
 			putMessages("Event " + event);
 		}
@@ -204,21 +210,36 @@ public class DatabaseConfigureViewComponent extends DatabaseViewComponent {
 		}
 		
 		//should use connection pooler
-		public void loadDatabase() {
+		public void setupConnectionDatabase() {
+			String dbType = (String)cbbDBType.getSelectedItem();
 			String driver = tfDriver.getText().trim();
 			String databaseName = tfDBName.getText().trim();
-			String url = "jdbc:sqlserver://" + tfHost.getText().trim() + ":" + tfPort.getText().trim() + ";databaseName=" + databaseName + ";selectMethod=cursor";
 			String user = tfUsername.getText().trim();
 			String pass = tfPassword.getText().trim();
 			
-			log.info(driver + ", " + url + ", " + user + ", " + pass);
-			TestConnection test = new TestConnection();
-			test.DatabaseConnectionTest(driver, databaseName, url, user, pass);
+			String url = "";
+			if(dbType.equalsIgnoreCase(DBEnumType.MSACCESS.getType())) {
+				url = "jdbc:odbc:Driver={Microsoft Access Driver (*.mdb)};DBQ=" + databaseName;
+			} else if(dbType.equalsIgnoreCase(DBEnumType.SQLSERVER.getType())) {
+				url = "jdbc:sqlserver://" + tfHost.getText().trim() + ":" + tfPort.getText().trim() + ";databaseName=" + databaseName + ";selectMethod=cursor";
+			}
+			if(DB2OntoPLWorkspaceTab.getDBOperationImplement() != null) {
+				try {
+					DB2OntoPLWorkspaceTab.getDBOperationImplement().close();
+				} catch (SQLException e) {
+					log.info("can not close connection");
+				}
+				DB2OntoPLWorkspaceTab.setDBOperationImplement(null);
+			}
+			DB2OntoPLWorkspaceTab.setDBOperationImplement(new DBOperationImplement(driver, url, databaseName, user, pass));
 			try {
-				test.ExeTest();
-			} catch (SQLException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+				DB2OntoPLWorkspaceTab.getDBOperationImplement().createConnection();
+				DB2OntoPLWorkspaceTab.setConnectStatus(true);
+				DB2OntoPLWorkspaceTab.getDBOperationEventManager().selectOperation(new DBOperationObject(DBOperationEventType.DB_OPERATION_CONNECTED));
+				log.info("connected");
+			} catch (DHConnectionException e) {
+				DB2OntoPLWorkspaceTab.setConnectStatus(false);
+				log.info("can not connect");
 			}
 		}
 
@@ -227,21 +248,6 @@ public class DatabaseConfigureViewComponent extends DatabaseViewComponent {
 			// TODO Auto-generated method stub
 			
 		}
-		
-//		public static void main(String args[]) {
-//			JFrame frame = new JFrame("Design Test");
-//			frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-//			
-//			DatabaseConfigurePanel main = new DatabaseConfigurePanel();
-//			
-//			frame.add(main);
-//			
-//			frame.setSize(400, 600);
-//			frame.setVisible(true);
-//		}
-
-		
-
-		
-	}
+	}//end class DatabaseConfigurePanel
+	
 }

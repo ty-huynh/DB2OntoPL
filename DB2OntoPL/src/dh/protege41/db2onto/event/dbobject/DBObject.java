@@ -5,7 +5,7 @@ public class DBObject {
 	private String _name;
 	
 	public String toString() {
-		return _type + " : " + _name;
+		return _name;
 	}
 	
 	public DBObject() {
@@ -13,25 +13,30 @@ public class DBObject {
 		_name = "unnamed";
 	}
 	
+	public DBObject(String name) {
+		_type = DBObjectType.DB_NULL_OBJECT;
+		_name = name;
+	}
+	
 	public DBObject(String type, String name) {
 		_type = type;
 		_name = name;
 	}
 
-	public String get_type() {
+	public String getType() {
 		return _type;
 	}
 
-	public void set_type(String _type) {
-		this._type = _type;
+	public void setType(String type) {
+		this._type = type;
 	}
 
-	public String get_name() {
+	public String getName() {
 		return _name;
 	}
 
-	public void set_name(String _name) {
-		this._name = _name;
+	public void setName(String name) {
+		this._name = name;
 	}
 	
 	

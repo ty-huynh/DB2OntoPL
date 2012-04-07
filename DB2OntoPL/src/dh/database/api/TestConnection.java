@@ -29,7 +29,13 @@ public class TestConnection {
 	}
 	
 	public void ExeTest() throws SQLException{
-		ResultSet rs = dbOperation.exeQuery("SELECT * FROM users");
+		ResultSet rs = null;
+		try {
+			rs = dbOperation.exeQuery("SELECT * FROM users");
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		ResultSetMetaData rsmeta = rs.getMetaData();
 		System.out.println("column count : " + rsmeta.getColumnCount());
 		System.out.println("records count:");

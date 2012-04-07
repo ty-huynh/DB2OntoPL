@@ -97,17 +97,17 @@ public class DatabaseDetailPanel extends JPanel implements DatabasePanel {
 	public JTreeComponent getDBTree() {
 		return dbTree;
 	}
-//	public static void main(String args[]) {
-//		JFrame frame = new JFrame("Design Test");
-//		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-//		
-//		DatabaseDetailPanel main = new DatabaseDetailPanel();
-//		
-//		frame.add(main);
-//		
-//		frame.setSize(400, 250);
-//		frame.setVisible(true);
-//	}
+	public static void main(String args[]) {
+		JFrame frame = new JFrame("Design Test");
+		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		
+		DatabaseDetailPanel main = new DatabaseDetailPanel();
+		
+		frame.add(main);
+		
+		frame.setSize(400, 250);
+		frame.setVisible(true);
+	}
 
 
 	@Override

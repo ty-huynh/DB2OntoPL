@@ -2,8 +2,11 @@ package dh.database.api;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
+import java.sql.SQLException;
 
 import org.apache.log4j.Logger;
+
+import dh.database.api.exception.DHConnectionException;
 
 public class DBConnection {
 	
@@ -36,9 +39,19 @@ public class DBConnection {
 		this.databaseName = databaseName;
 	}
 
-	public Connection connect() throws Exception {
-		Class.forName(this.driver);
-		return DriverManager.getConnection(url, username, password);
+	public Connection connect() throws Exception{
+		Connection conn = null;
+		try {
+			Class.forName(this.driver);
+			conn = DriverManager.getConnection(url, username, password);
+		} catch (ClassNotFoundException e) {
+			log.info("Driver error");
+			throw new DHConnectionException("connection failure");
+		} catch (SQLException e) {
+			log.info("Connection error");
+			throw new DHConnectionException("connection failure");
+		}
+		return conn;
 	}
 	
 	public String getDriver() {

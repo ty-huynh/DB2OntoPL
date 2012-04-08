@@ -163,7 +163,7 @@ public class DatabaseConfigureViewComponent extends DatabaseViewComponent {
 				public void actionPerformed(ActionEvent e) {
 					// TODO Auto-generated method stub
 //					handleEvents(DBOperationEventType.DB_OPERATION_CHANGE);
-					DatabaseConfigureViewComponent.setGlobalDBOperationOBject(new DBOperationObject(DBOperationEventType.DB_OPERATION_CHANGE));
+					DatabaseConfigureViewComponent.setGlobalDBOperationObject(new DBOperationObject(DBOperationEventType.DB_OPERATION_CHANGE));
 				}
 			});
 			
@@ -235,7 +235,7 @@ public class DatabaseConfigureViewComponent extends DatabaseViewComponent {
 			try {
 				DB2OntoPLWorkspaceTab.getDBOperationImplement().createConnection();
 				DB2OntoPLWorkspaceTab.setConnectStatus(true);
-				DB2OntoPLWorkspaceTab.getDBOperationEventManager().selectOperation(new DBOperationObject(DBOperationEventType.DB_OPERATION_CONNECTED));
+				setGlobalDBOperationObject(new DBOperationObject(DBOperationEventType.DB_OPERATION_CONNECTED));
 				log.info("connected");
 			} catch (DHConnectionException e) {
 				DB2OntoPLWorkspaceTab.setConnectStatus(false);

@@ -2,6 +2,40 @@
 <?eclipse version="3.0"?>
 
 <plugin>
+
+	<!--database column description view component -->
+   <extension
+         id="DatabaseColumnDescriptionViewComponent"
+         name="Column description"
+         point="org.protege.editor.core.application.ViewComponent">
+      <label value="Column description"></label>
+      <class value="dh.protege41.db2onto.tab.DatabaseColumnDescriptionViewComponent"></class>
+      <category value="@org.protege.ontologycategory"></category>
+      <headerColor value="@org.protege.individualcolor"/>
+   </extension>
+   
+	<!--database table description view component -->
+   <extension
+         id="DatabaseTableDescriptionViewComponent"
+         name="Table description"
+         point="org.protege.editor.core.application.ViewComponent">
+      <label value="Table description"></label>
+      <class value="dh.protege41.db2onto.tab.DatabaseTableDescriptionViewComponent"></class>
+      <category value="@org.protege.ontologycategory"></category>
+      <headerColor value="@org.protege.individualcolor"/>
+   </extension>
+   
+   <!--database description view component -->
+   <extension
+         id="DatabaseDescriptionViewComponent"
+         name="Database description"
+         point="org.protege.editor.core.application.ViewComponent">
+      <label value="Database description"></label>
+      <class value="dh.protege41.db2onto.tab.DatabaseDescriptionViewComponent"></class>
+      <category value="@org.protege.ontologycategory"></category>
+      <headerColor value="@org.protege.individualcolor"/>
+   </extension>
+   
    <!--Example view component -->
    <extension
          id="ExampleViewComponent"
@@ -18,7 +52,7 @@
          id="DatabaseDetailViewComponent"
          name="Database Detail View Component"
          point="org.protege.editor.core.application.ViewComponent">
-      <label value="Database View Component"></label>
+      <label value="Database Detail"></label>
       <class value="dh.protege41.db2onto.tab.DatabaseDetailViewComponent"></class>
       <category value="@org.protege.ontologycategory"></category>
       <headerColor value="@org.protege.classcolor"/>
@@ -29,7 +63,7 @@
          id="DatabaseConfigureViewComponent"
          name="Database Configure View Component"
          point="org.protege.editor.core.application.ViewComponent">
-      <label value="Database View Component"></label>
+      <label value="Database Configuration"></label>
       <class value="dh.protege41.db2onto.tab.DatabaseConfigureViewComponent"></class>
       <category value="@org.protege.ontologycategory"></category>
       <headerColor value="@org.protege.classcolor"/>
@@ -40,7 +74,7 @@
          id="DatabaseRecordsViewComponent"
          name="Database Records View Component"
          point="org.protege.editor.core.application.ViewComponent">
-      <label value="Database Records Component"></label>
+      <label value="Database Records"></label>
       <class value="dh.protege41.db2onto.tab.DatabaseRecordsViewComponent"></class>
       <category value="@org.protege.ontologycategory"></category>
       <headerColor value="@org.protege.classcolor"/>
@@ -49,7 +83,7 @@
    <!-- Main workspace tab -->
    <extension
          id="DB2OntoPLWorkspaceTab"
-         name="Main Workspace Tab"
+         name="DB2OntoPL Workspace Tab"
          point="org.protege.editor.core.application.WorkspaceTab">
       <label value="DB2OntoPL"></label>
       <class value="dh.protege41.db2onto.tab.DB2OntoPLWorkspaceTab"></class>

@@ -77,7 +77,7 @@ public abstract class DatabaseViewComponent extends AbstractOWLViewComponent{
 		return _lastPerformedDBOperation;
 	}
 	
-	protected static void setGlobalDBOperationOBject(DBOperationObject dbOperation) {
+	protected static void setGlobalDBOperationObject(DBOperationObject dbOperation) {
 		DB2OntoPLWorkspaceTab.getDBOperationEventManager().selectOperation(dbOperation);
 	}
 }

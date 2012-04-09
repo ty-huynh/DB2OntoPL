@@ -53,6 +53,9 @@
      <copy todir="${classes}/lib">
        <fileset dir="${lib}" excludes="junit*.jar"/>
      </copy>
+   	 <copy todir="${classes}/resources">
+   	   <fileset dir="${resources}"/>
+   	 </copy>
      <copy todir="${classes}">
        <fileset dir="." includes="viewconfig-*.xml,plugin.xml"/>
      </copy>
@@ -122,7 +125,9 @@
    <property name = "build"           location = "./build"/>
    <property name = "classes"         location = "${build}/classes"/>
    <property name = "lib"             location = "./lib"/>
+   <property name = "resources"       location = "./resources"/>
    <property name = "genlib"          location = "${build}/lib"/>
+   <property name = "genres"		  location = "${build}/resources"/>
    <property name = "manifest"        location = "${build}/manifest.mf"/>
 
    <!-- 
@@ -165,6 +170,7 @@
      <mkdir dir = "${build}"/>
      <mkdir dir = "${classes}"/>
      <mkdir dir = "${classes}/lib"/>
+   	 <mkdir dir = "${classes}/resources"/>
      <mkdir dir = "${genlib}"/>
    </target>  
    	

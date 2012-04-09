@@ -6,6 +6,16 @@ public class DBObjectTable extends DBObject {
 	public static final String TABLE_NAME = "TABLE_NAME"; //string name of table
 	public static final String TABLE_TYPE = "TABLE_TYPE";//string
 	
+	//header name
+	public static final String CATEGORY = "Category";
+	public static final String SCHEM = "Schem";
+	public static final String TYPE = "Type";
+	public static final String COLUMNS = "Columns";
+	public static final String REF_BY = "Referenced by";
+	public static final String REF_TO = "Reference to";
+	public static final String PRIMARY_KEY = "Primary key";
+	public static final String FOREIGN_KEY = "Foreign keys";
+	
 	private String category;
 	private String schem;
 	private String type;
@@ -40,5 +50,4 @@ public class DBObjectTable extends DBObject {
 	public void setType(String type) {
 		this.type = type;
 	}
-	
 }

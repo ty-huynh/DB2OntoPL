@@ -18,6 +18,13 @@ public class DBObjectColumn extends DBObject {
 	public static final String CHAR_OCTET_LENGTH = "CHAR_OCTET_LENGTH";//int
 	public static final String ORIGINAL_POSITION = "ORIGINAL_POSITION";//invalid
 
+	//header name
+	public static final String COL_DATA_TYPE = "Data type";
+	public static final String COL_TYPE_NAME = "Type name";
+	public static final String COL_SIZE = "Size";
+	public static final String COL_NULL = "Is null";
+	public static final String COL_PK = "Is primary key";
+	public static final String COL_FK = "Is foreign key";
 	
 	private int dataType;
 	private String typeName;
@@ -46,6 +53,11 @@ public class DBObjectColumn extends DBObject {
 			log.info("create column object error: convert error");
 		}
 	}
+	
+	public String isPrimaryKey() {
+		return (getTypeName().contains("identity") ? "YES" : "NO");
+	}
+	
 	public int getDataType() {
 		return dataType;
 	}
@@ -64,8 +76,8 @@ public class DBObjectColumn extends DBObject {
 	public void setSize(int size) {
 		this.size = size;
 	}
-	public boolean isNull() {
-		return isNull;
+	public String isNull() {
+		return (isNull ? "YES" : "NO");
 	}
 	public void setNull(boolean isNull) {
 		this.isNull = isNull;

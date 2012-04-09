@@ -66,7 +66,6 @@ public abstract class DatabaseViewComponent extends AbstractOWLViewComponent{
 			updateView();
 			updateHeader();
 		}
-		
 	}
 	
 	protected abstract void updateHeader();

@@ -14,6 +14,9 @@ import javax.swing.JPanel;
 import javax.swing.JTextArea;
 import javax.swing.ListCellRenderer;
 
+import dh.protege41.db2onto.common.DB2OntoPLConstants;
+import dh.protege41.db2onto.common.DBIcons;
+
 public class DBListCellRenderer extends JPanel implements ListCellRenderer {
 
 	private JLabel lbIcon;
@@ -33,12 +36,7 @@ public class DBListCellRenderer extends JPanel implements ListCellRenderer {
 		lbHeader = new JLabel();
 		
 		lbIcon = new JLabel();
-		try{
-			URL imgUrl = getClass().getResource("/resources/images/icon.png");
-			lbIcon.setIcon(new ImageIcon(imgUrl));
-		} catch(Exception e) {
-			System.out.println("could not find path icon.png");
-		}
+		lbIcon.setIcon(DBIcons.getIcon("icon.png"));
 		
 		
 		JPanel contentPanel = new JPanel(new BorderLayout(3, 3));

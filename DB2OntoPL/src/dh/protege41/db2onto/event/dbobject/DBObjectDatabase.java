@@ -1,6 +1,16 @@
 package dh.protege41.db2onto.event.dbobject;
 
 public class DBObjectDatabase extends DBObject {
+	
+	public static final String PRODUCT_NAME = "Product name";
+	public static final String PRODUCT_VERSION = "Product version";
+	public static final String DRIVER_NAME = "Driver name";
+	public static final String DRIVER_VERSION = "Driver version";
+	public static final String URL = "Url";
+	public static final String USERNAME = "Username";
+	public static final String READONLY = "Read only";
+	public static final String RELATIONS = "Relations";
+	
 	private String productName;
 	private String productVersion;
 	private String driverName;
@@ -71,8 +81,8 @@ public class DBObjectDatabase extends DBObject {
 	public void setUsername(String username) {
 		this.username = username;
 	}
-	public boolean isReadOnly() {
-		return isReadOnly;
+	public String isReadOnly() {
+		return (isReadOnly? "Yes" : "No");
 	}
 	public void setReadOnly(boolean isReadOnly) {
 		this.isReadOnly = isReadOnly;

@@ -3,6 +3,8 @@ package dh.protege41.db2onto.tab;
 import org.apache.log4j.Logger;
 
 import dh.protege41.db2onto.event.dbobject.DBObject;
+import dh.protege41.db2onto.event.dbobject.DBObjectDatabase;
+import dh.protege41.db2onto.event.dbobject.DBObjectTable;
 import dh.protege41.db2onto.event.dboperation.DBOperationObject;
 
 public class DatabaseTableDescriptionViewComponent extends DatabaseViewComponent {
@@ -27,9 +29,17 @@ public class DatabaseTableDescriptionViewComponent extends DatabaseViewComponent
 	@Override
 	protected DBObject updateView() {
 		// TODO Auto-generated method stub
+		DBObject dbObject = getLastDisplayedDBObject();
+		if(dbObject instanceof DBObjectTable) {
+			log.info("table object was selected : " + ((DBObjectTable)dbObject).getName());
+		}
 		return null;
 	}
-
+	@Override
+	protected void updateHeader() {
+		// TODO Auto-generated method stub
+		
+	}
 	@Override
 	protected DBOperationObject performOperation() {
 		// TODO Auto-generated method stub

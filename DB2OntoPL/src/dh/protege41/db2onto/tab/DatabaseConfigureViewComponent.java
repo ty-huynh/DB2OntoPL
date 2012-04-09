@@ -57,7 +57,11 @@ public class DatabaseConfigureViewComponent extends DatabaseViewComponent {
 		// TODO Auto-generated method stub
 		return null;
 	}
-
+	@Override
+	protected void updateHeader() {
+		// TODO Auto-generated method stub
+		
+	}
 	@Override
 	protected DBOperationObject performOperation() {
 		// TODO Auto-generated method stub

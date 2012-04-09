@@ -27,7 +27,11 @@ public class DBOperationImplement implements DBOperation {
 	public DBOperationImplement(String driver, String url, String databaseName, String username, String password) {
 		dbConnection = new DBConnection(driver, url, databaseName, username, password);
 	}
-
+	
+	public Connection getCurrentConnection() {
+		return conn;
+	}
+	
 	@Override
 	public Connection createConnection() throws DHConnectionException {
 		// TODO Auto-generated method stub

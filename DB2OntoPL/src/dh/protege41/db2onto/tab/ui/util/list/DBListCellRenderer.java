@@ -25,7 +25,7 @@ public class DBListCellRenderer extends JPanel implements ListCellRenderer {
 		setBorder(BorderFactory.createEmptyBorder(1, 2, 1, 1));
 		
 		contentArea = new JTextArea();
-		contentArea.setFont(new Font("Dialog", Font.PLAIN, 12));
+		contentArea.setFont(new Font("Dialog", Font.BOLD, 12));
 		contentArea.setLineWrap(true);
 		contentArea.setWrapStyleWord(true);
 		contentArea.setOpaque(false);
@@ -34,7 +34,7 @@ public class DBListCellRenderer extends JPanel implements ListCellRenderer {
 		
 		lbIcon = new JLabel();
 		try{
-			URL imgUrl = getClass().getResource("icon.png");
+			URL imgUrl = getClass().getResource("/resources/images/icon.png");
 			lbIcon.setIcon(new ImageIcon(imgUrl));
 		} catch(Exception e) {
 			System.out.println("could not find path icon.png");
@@ -42,7 +42,7 @@ public class DBListCellRenderer extends JPanel implements ListCellRenderer {
 		
 		
 		JPanel contentPanel = new JPanel(new BorderLayout(3, 3));
-		contentPanel.setBorder(BorderFactory.createEmptyBorder(2, 20, 2, 2));
+		contentPanel.setBorder(BorderFactory.createEmptyBorder(1, 2, 1, 1));
 		contentPanel.setOpaque(false);
 		contentPanel.add(lbHeader, BorderLayout.NORTH);
 		contentPanel.add(contentArea, BorderLayout.CENTER);

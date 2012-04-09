@@ -10,7 +10,7 @@ public class DBListItem implements MListItem {
 		object = o;
 	}
 	public String toString() {
-		return "LI : " + object.toString(); 
+		return object.toString(); 
 	}
 	
 	public Object getObject() {
@@ -43,7 +43,7 @@ public class DBListItem implements MListItem {
 	@Override
 	public boolean isEditable() {
 		// TODO Auto-generated method stub
-		return true;
+		return false;
 	}
 
 }

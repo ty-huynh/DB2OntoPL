@@ -27,7 +27,7 @@ public abstract class DatabaseViewComponent extends AbstractOWLViewComponent{
 	private DBOperationEventListener _operationListener;
 	private DBObject _lastDisplayedDBObject;
 	private DBOperationObject _lastPerformedDBOperation;
-	
+	private String _header;
 	@Override
 	protected void disposeOWLView() {
 		// TODO Auto-generated method stub
@@ -43,7 +43,7 @@ public abstract class DatabaseViewComponent extends AbstractOWLViewComponent{
 			public void dbObjectChanged(DBObjectEvent event) {
 				// TODO Auto-generated method stub
 				DBObject dbObject = event.getSelectedDBObject();
-				DatabaseViewComponent.this.updateContentAndHeader();
+				DatabaseViewComponent.this.updateContentAndHeader(dbObject);
 			}
 		};
 		_operationListener = new DBOperationEventListener() {
@@ -58,26 +58,33 @@ public abstract class DatabaseViewComponent extends AbstractOWLViewComponent{
 		
 		DB2OntoPLWorkspaceTab.getDBObjectEventManager().addDBEventListener(_objectListener);
 		DB2OntoPLWorkspaceTab.getDBOperationEventManager().addDBOperationListener(_operationListener);
-		
 	}
 
-	protected void updateContentAndHeader() {
+	protected void updateContentAndHeader(DBObject dbObject) {
+		if(!dbObject.equals(_lastDisplayedDBObject) && dbObject != null){
+			_lastDisplayedDBObject = dbObject;
+			updateView();
+			updateHeader();
+		}
 		
 	}
 	
-	protected void updateHeader(DBObject dbObject) {
-		if(dbObject != null) getView().setHeaderText(dbObject.toString());
-	}
+	protected abstract void updateHeader();
 	
 	protected abstract DBObject updateView();
 	
 	protected abstract DBOperationObject performOperation();
 	
-	protected DBOperationObject getLastPerformedDBOperation() {
+	protected synchronized DBOperationObject getLastPerformedDBOperation() {
 		return _lastPerformedDBOperation;
 	}
-	
-	protected static void setGlobalDBOperationObject(DBOperationObject dbOperation) {
+	protected synchronized DBObject getLastDisplayedDBObject() {
+		return _lastDisplayedDBObject;
+	}
+	protected synchronized static void setGlobalDBOperationObject(DBOperationObject dbOperation) {
 		DB2OntoPLWorkspaceTab.getDBOperationEventManager().selectOperation(dbOperation);
+	}
+	protected synchronized static void setGlobalSelectionObject(DBObject dbObject) {
+		DB2OntoPLWorkspaceTab.getDBObjectEventManager().changeDBObject(dbObject);
 	}
 }

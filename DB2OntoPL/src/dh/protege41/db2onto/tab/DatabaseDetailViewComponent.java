@@ -66,10 +66,14 @@ public class DatabaseDetailViewComponent extends DatabaseViewComponent {
 
 	@Override
 	protected DBObject updateView() {
-		// TODO Auto-generated method stub
+		
 		return null;
 	}
-
+	@Override
+	protected void updateHeader() {
+		// TODO Auto-generated method stub
+		
+	}
 	@Override
 	protected DBOperationObject performOperation() {
 		// TODO Auto-generated method stub
@@ -164,6 +168,13 @@ public class DatabaseDetailViewComponent extends DatabaseViewComponent {
 		public void buildDatabaseTree() {
 			try {
 				DatabaseMetaData meta = dbOperationImpl.getDatabaseMetaData();
+				ResultSet rs = meta.getPrimaryKeys(null, null, "students");
+
+			    while (rs.next()) {
+			      String columnName = rs.getString("COLUMN_NAME");
+			      System.out.println("getPrimaryKeys(): columnName=" + columnName);
+			    }
+
 				centerPanel.remove(scroll);
 				DBTreeNode root = new DBTreeNode(new DBObjectDatabase(
 						meta.getDatabaseProductName(),
@@ -224,11 +235,11 @@ public class DatabaseDetailViewComponent extends DatabaseViewComponent {
 					for(TreePath obj : paths) {
 						if(event.isAddedPath(obj)) {
 							DefaultMutableTreeNode node = (DefaultMutableTreeNode) obj.getLastPathComponent();
-							log.info(((DBObject)node.getUserObject()).getType());
-						
+//							log.info(((DBObject)node.getUserObject()).getType());
+							DatabaseViewComponent.setGlobalSelectionObject((DBObject)node.getUserObject());
 						} else {
 							DefaultMutableTreeNode node = (DefaultMutableTreeNode) obj.getLastPathComponent();
-							log.info(((DBObject)node.getUserObject()).getName());
+//							log.info(((DBObject)node.getUserObject()).getName());
 						}
 					}
 					

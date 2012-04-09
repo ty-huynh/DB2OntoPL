@@ -41,5 +41,11 @@ public class ExampleViewComponent extends DatabaseViewComponent {
 		return null;
 	}
 
+	@Override
+	protected void updateHeader() {
+		// TODO Auto-generated method stub
+		
+	}
+
     
 }

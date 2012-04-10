@@ -3,6 +3,7 @@ package dh.protege41.db2onto.tab;
 import org.apache.log4j.Logger;
 import org.protege.editor.owl.ui.view.AbstractOWLViewComponent;
 
+import dh.database.api.DBOperationImplement;
 import dh.protege41.db2onto.event.dbobject.DBObject;
 import dh.protege41.db2onto.event.dbobject.DBObjectEvent;
 import dh.protege41.db2onto.event.dbobject.DBObjectEventListener;
@@ -76,6 +77,9 @@ public abstract class DatabaseViewComponent extends AbstractOWLViewComponent{
 	
 	protected synchronized DBOperationObject getLastPerformedDBOperation() {
 		return _lastPerformedDBOperation;
+	}
+	protected synchronized DBOperationImplement getDBOperationImpl() {
+		return DB2OntoPLWorkspaceTab.getDBOperationImplement();
 	}
 	protected synchronized DBObject getLastDisplayedDBObject() {
 		return _lastDisplayedDBObject;

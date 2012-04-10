@@ -33,13 +33,13 @@ public class DB2OntoPLWorkspaceTab extends OWLWorkspaceViewsTab{
 	private static DBOperationEventManager _dbOperationEventManager = new DBOperationEventManager();
 	private static DBOperationImplement _dbOperation = null;
 	private static boolean _connected = false;
-	
 	public static boolean isConnected() {
 		return _connected;
 	}
 	public static void setConnectStatus(boolean status) {
 		_connected = status;
 	}
+	
 	public static void checkConnect() {
 		if(_connected) {
 			try {
@@ -47,13 +47,18 @@ public class DB2OntoPLWorkspaceTab extends OWLWorkspaceViewsTab{
 				log.info("connection is ok");
 			} catch (DHConnectionException e) {
 				_connected = false;
+				_dbOperation = null;
 				log.info("connection was lost");
 				_dbOperationEventManager.selectOperation(new DBOperationObject(DBOperationEventType.DB_OPERATION_DISCONNECT));
 			}
 		}
 	}
 	public static DBOperationImplement getDBOperationImplement() {
+		if(_connected) {
+			checkConnect();
+		}
 		return _dbOperation;
+		
 	}
 	
 	public static void setDBOperationImplement(DBOperationImplement paramDBOperation) {

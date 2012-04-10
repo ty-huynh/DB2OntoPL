@@ -32,6 +32,6 @@ public class DBOperationEventManager {
 		while(iterator.hasNext()) {
 			iterator.next().dbOperationPerformed(dbOperEvent);
 		}
-		log.info("operation fire to " + _listeners.size() + " listener(s)");
+//		log.info("operation fire to " + _listeners.size() + " listener(s)");
 	}
 }

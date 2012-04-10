@@ -47,11 +47,9 @@ public class DatabaseColumnDescriptionViewComponent extends DatabaseViewComponen
 	
 	@Override
 	protected DBObject updateView() {
-		// TODO Auto-generated method stub
 		DBObject dbObject = getLastDisplayedDBObject();
 		if(dbObject instanceof DBObjectColumn) {
 			dbColumnDescriptionComponent.handleEvents(DBObjectEventType.DB_OBJECT_SELECTION_CHANGED);
-//			log.info("column object was selected : " + ((DBObjectColumn)dbObject).getName());
 		}
 		return null;
 	}

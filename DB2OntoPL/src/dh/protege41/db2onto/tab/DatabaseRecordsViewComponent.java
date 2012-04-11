@@ -4,6 +4,8 @@ import java.awt.BorderLayout;
 import java.awt.FlowLayout;
 import java.awt.GridLayout;
 import java.awt.Point;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseMotionListener;
 import java.sql.ResultSet;
@@ -13,12 +15,14 @@ import java.util.List;
 import java.util.Vector;
 
 import javax.swing.JButton;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextField;
 
 import org.apache.log4j.Logger;
 import org.protege.editor.core.ui.util.CheckTableModel;
+import org.protege.editor.core.ui.util.JOptionPaneEx;
 
 import dh.database.api.DBOperationImplement;
 import dh.protege41.db2onto.event.dbobject.DBObject;
@@ -26,7 +30,9 @@ import dh.protege41.db2onto.event.dbobject.DBObjectEventType;
 import dh.protege41.db2onto.event.dbobject.DBObjectTable;
 import dh.protege41.db2onto.event.dboperation.DBOperationEventType;
 import dh.protege41.db2onto.event.dboperation.DBOperationObject;
+import dh.protege41.db2onto.tab.ui.DatabaseExEditorPanel;
 import dh.protege41.db2onto.tab.ui.DatabasePanel;
+import dh.protege41.db2onto.tab.ui.util.dialog.DialogUtility;
 import dh.protege41.db2onto.tab.ui.util.table.DBCheckTable;
 
 public class DatabaseRecordsViewComponent extends DatabaseViewComponent{
@@ -91,6 +97,7 @@ public class DatabaseRecordsViewComponent extends DatabaseViewComponent{
 		private DBCheckTable<String> table;
 		private CheckTableModel<String> tableModel;
 		
+		private JButton btnCreateIndi;
 		private JButton btn1;
 		private JButton btn2;
 		private JButton btn3;
@@ -113,6 +120,7 @@ public class DatabaseRecordsViewComponent extends DatabaseViewComponent{
 			topRightPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
 			centerPanel = new JScrollPane(table);
 			
+			btnCreateIndi = new JButton("Create Individuals");
 			btn1 = new JButton("One");
 			btn2 = new JButton("Two");
 			btn3 = new JButton("Thr");
@@ -125,6 +133,7 @@ public class DatabaseRecordsViewComponent extends DatabaseViewComponent{
 		public void attachComponents() {
 			// TODO Auto-generated method stub
 			//add to top left panel
+			topLeftPanel.add(btnCreateIndi);
 			topLeftPanel.add(btn1);
 			topLeftPanel.add(btn2);
 			topLeftPanel.add(btn3);
@@ -145,7 +154,15 @@ public class DatabaseRecordsViewComponent extends DatabaseViewComponent{
 		@Override
 		public void initEventListeners() {
 			// TODO Auto-generated method stub
-			
+			btnCreateIndi.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					// TODO Auto-generated method stub
+					_handleCreateIndividuals();
+					
+					
+				}
+			});
 		}
 
 		@Override
@@ -214,27 +231,45 @@ public class DatabaseRecordsViewComponent extends DatabaseViewComponent{
 			table.addMouseMotionListener(new MouseMotionListener() {
 				@Override
 				public void mouseMoved(MouseEvent e) {
-					// TODO Auto-generated method stub
-					Point pt = table.getMousePosition();
-					if(pt != null) {
-						int row = table.rowAtPoint(pt);
-						int col = table.columnAtPoint(pt);
-						if(!(col == table.getLastColumn() && row == table.getLastRow()) && (col != 0)) {
-							table.setLastColumn(col);
-							table.setLastRow(row);
-							String content = tableModel.getValueAt(row, col).toString();
-							table.setTooltip(table.getColumnName(col), content);
-//							setToolTipText(content);
-							log.info(content);
-						}
-					}
+					_handleMouseMoved();
 				}
 				@Override
 				public void mouseDragged(MouseEvent e) {
-					// TODO Auto-generated method stub
-					
 				}
 			});
 		}
+		
+		private void _handleMouseMoved() {
+			Point pt = table.getMousePosition();
+			if(pt != null) {
+				int row = table.rowAtPoint(pt);
+				int col = table.columnAtPoint(pt);
+				if(!(col == table.getLastColumn() && row == table.getLastRow()) && (col != 0)) {
+					table.setLastColumn(col);
+					table.setLastRow(row);
+					String content = tableModel.getValueAt(row, col).toString();
+					table.setTooltip(table.getColumnName(col), content);
+//					setToolTipText(content);
+					log.info(content);
+				}
+			}
+		}
+		private void _handleCreateIndividuals() {
+			if(table == null) {
+				return;
+			}
+			DatabaseExEditorPanel panel = new DatabaseExEditorPanel(
+					DatabaseRecordsViewComponent.this.getOWLEditorKit(),
+					table.getAllColumnsIdentifiers(), 
+					table.getSelectedRecords());
+			int choice = DialogUtility.showConfirmDialog(null, "Table", panel, JOptionPane.PLAIN_MESSAGE, JOptionPane.OK_CANCEL_OPTION, null, false);
+			if(choice == JOptionPane.OK_OPTION) {
+				panel.handleEvents(DBOperationEventType.DB_OPERATION_CANCEL);
+			} else if(choice == JOptionPane.CANCEL_OPTION) {
+				log.info("Cancel selected");
+			}
+			
+		}
+		
 	}
 }

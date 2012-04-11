@@ -1,5 +1,8 @@
 package dh.protege41.db2onto.tab.ui.util.table;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import javax.swing.table.DefaultTableCellRenderer;
 
 import org.apache.log4j.Logger;
@@ -45,12 +48,52 @@ public class DBCheckTable<O> extends CheckTable<O> {
 	}
 	
 	public void setTooltip(String idCol, String text) {
-		DefaultTableCellRenderer cellRender = new DefaultTableCellRenderer();
+		DefaultTableCellRenderer cellRender = (DefaultTableCellRenderer) getColumn(idCol).getCellRenderer();
+		if(cellRender == null) {
+			cellRender = new DefaultTableCellRenderer();
+		}
 		cellRender.setToolTipText(text);
 		getColumn(idCol).setCellRenderer(cellRender);
 		revalidate();
 	}
 
+	public O getColumnIdentifier(int col) {
+		return (O)getColumnModel().getColumn(col).getIdentifier();
+	}
+	
+	public List<O> getAllColumnsIdentifiers() {
+		List<O> identifiers = new ArrayList<O>();
+		for(int i = 0; i < getColumnCount(); i++) {
+			identifiers.add((O)getColumnIdentifier(i));
+		}
+		return identifiers;
+	}
+	
+	public List<List<O>> getSelectedRecords() {
+		int totalRows = getRowCount();
+		int totalCols = getColumnCount();
+		List<List<O>> list = new ArrayList<List<O>>();
+		for(int i = 0; i < totalRows; i++) {
+			if(getValueAt(i, 0).equals(Boolean.TRUE)) {//checkbox is checked
+				List<O> row = new ArrayList<O>();
+				for(int j = 1; j < totalCols; j++) {
+					row.add((O) getValueAt(i, j));
+				}
+				log.info(row);
+				list.add(row);
+			}
+		}
+		return list;
+	}
+	
+	public List<O> getColumnData(int col) {
+		List<O> colData = new ArrayList<O>();
+		for(int i = 0; i < getRowCount(); i++) {
+			colData.add((O)getValueAt(i, col));
+		}
+		return colData;
+	}
+	
 	public int getLastColumn() {
 		return _lastColumn;
 	}

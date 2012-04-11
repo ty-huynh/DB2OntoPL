@@ -168,12 +168,11 @@ public class DatabaseDetailViewComponent extends DatabaseViewComponent {
 		public void buildDatabaseTree() {
 			try {
 				DatabaseMetaData meta = dbOperationImpl.getDatabaseMetaData();
-				ResultSet rs = meta.getPrimaryKeys(null, null, "students");
-
-			    while (rs.next()) {
-			      String columnName = rs.getString("COLUMN_NAME");
-			      System.out.println("getPrimaryKeys(): columnName=" + columnName);
-			    }
+//				ResultSet rs = meta.getPrimaryKeys(null, null, "students");
+//				while (rs.next()) {
+//					String columnName = rs.getString("COLUMN_NAME");
+//					System.out.println("getPrimaryKeys(): columnName=" + columnName);
+//				}
 
 				centerPanel.remove(scroll);
 				DBTreeNode root = new DBTreeNode(new DBObjectDatabase(

@@ -159,8 +159,6 @@ public class DatabaseRecordsViewComponent extends DatabaseViewComponent{
 				public void actionPerformed(ActionEvent e) {
 					// TODO Auto-generated method stub
 					_handleCreateIndividuals();
-					
-					
 				}
 			});
 		}
@@ -262,7 +260,7 @@ public class DatabaseRecordsViewComponent extends DatabaseViewComponent{
 					DatabaseRecordsViewComponent.this.getOWLEditorKit(),
 					table.getAllColumnsIdentifiers(), 
 					table.getSelectedRecords());
-			int choice = DialogUtility.showConfirmDialog(null, "Table", panel, JOptionPane.PLAIN_MESSAGE, JOptionPane.OK_CANCEL_OPTION, null, false);
+			int choice = DialogUtility.showConfirmDialog(null, "Create individuals", panel, JOptionPane.PLAIN_MESSAGE, JOptionPane.OK_CANCEL_OPTION, null, false);
 			if(choice == JOptionPane.OK_OPTION) {
 				panel.handleEvents(DBOperationEventType.DB_OPERATION_CANCEL);
 			} else if(choice == JOptionPane.CANCEL_OPTION) {

@@ -63,7 +63,7 @@ public class FormUtility {
 		labelConstraints.weightx = 0.0;
 		labelConstraints.gridwidth = 1;
 	}
-	
+
 	/**
 	 * Adds a field component. Any component may be used. The
 	 * component will be stretched to take the remainder of
@@ -74,7 +74,7 @@ public class FormUtility {
 		gbl.setConstraints(c, lastConstraints);
 		parent.add(c);
 	}
-	
+
 	/**
 	 * Adds an arbitrary label component, starting a new row
 	 * if appropriate. The width of the component will be set
@@ -86,7 +86,7 @@ public class FormUtility {
 		gbl.setConstraints(c, labelConstraints);
 		parent.add(c);
 	}
-	
+
 	/**
 	 * Adds a JLabel with the given string to the label column
 	 */
@@ -95,7 +95,7 @@ public class FormUtility {
 		addLabel(c, parent);
 		return c;
 	}
-	
+
 	/**
 	 * Adds a "middle" field component. Any component may be
 	 * used. The component will be stretched to take all of

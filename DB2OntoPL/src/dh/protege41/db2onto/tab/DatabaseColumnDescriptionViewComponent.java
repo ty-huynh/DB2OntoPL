@@ -139,16 +139,17 @@ public class DatabaseColumnDescriptionViewComponent extends DatabaseViewComponen
 		public void resetDBListModel(DBObjectColumn dbObject) {
 			List<Object> listObjects = new ArrayList<Object>();
 			listObjects.add(new DBListHeader(DBObjectColumn.COL_PK));
-			listObjects.add(new DBListItem(dbObject.isPrimaryKey()));
+			listObjects.add(new DBListItem(dbObject.getPrimaryString()));
 			listObjects.add(new DBListHeader(DBObjectColumn.COL_FK));
+			listObjects.add(new DBListItem(dbObject.getForeignString()));
 //			listObjects.add(new DBListHeader(DBObjectColumn.COL_DATA_TYPE));
 //			listObjects.add(new DBListItem(dbObject.getDataType()));
 			listObjects.add(new DBListHeader(DBObjectColumn.COL_TYPE_NAME));
 			listObjects.add(new DBListItem(dbObject.getTypeName()));
-			listObjects.add(new DBListHeader(DBObjectColumn.COL_SIZE));
+//			listObjects.add(new DBListHeader(DBObjectColumn.COL_SIZE));
 //			listObjects.add(new DBListItem(dbObject.getSize()));
-//			listObjects.add(new DBListHeader(DBObjectColumn.COL_NULL));
-			listObjects.add(new DBListItem(dbObject.isNullable()));
+			listObjects.add(new DBListHeader(DBObjectColumn.COL_NULLABLE));
+			listObjects.add(new DBListItem(dbObject.getNullableString()));
 			dbList.setListObjects(listObjects);
 			dbList.revalidate();
 		}

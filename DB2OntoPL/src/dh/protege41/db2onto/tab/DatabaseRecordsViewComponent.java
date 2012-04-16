@@ -35,7 +35,7 @@ import dh.protege41.db2onto.tab.ui.DatabasePanel;
 import dh.protege41.db2onto.tab.ui.util.dialog.DialogUtility;
 import dh.protege41.db2onto.tab.ui.util.table.DBCheckTable;
 
-public class DatabaseRecordsViewComponent extends DatabaseViewComponent{
+public class DatabaseRecordsViewComponent extends DatabaseViewComponent {
 	/**
 	 * 
 	 */

@@ -13,7 +13,7 @@ public class DBObjectDatabase extends DBObject {
 	public static final String URL = "Url";
 	public static final String USERNAME = "Username";
 	public static final String READONLY = "Read only";
-	public static final String RELATIONS = "Relations";
+	public static final String TABLES = "Tables";
 	
 	private String productName;
 	private String productVersion;

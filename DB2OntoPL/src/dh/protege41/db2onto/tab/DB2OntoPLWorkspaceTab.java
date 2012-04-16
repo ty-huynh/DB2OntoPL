@@ -7,6 +7,7 @@ import com.sun.xml.internal.ws.message.saaj.SAAJHeader;
 
 import dh.database.api.DBOperationImplement;
 import dh.database.api.exception.DHConnectionException;
+import dh.protege41.db2onto.event.dbobject.DBObjectDatabase;
 import dh.protege41.db2onto.event.dbobject.DBObjectEventManager;
 import dh.protege41.db2onto.event.dboperation.DBOperationEventManager;
 import dh.protege41.db2onto.event.dboperation.DBOperationEventType;
@@ -32,6 +33,7 @@ public class DB2OntoPLWorkspaceTab extends OWLWorkspaceViewsTab{
 	private static DBObjectEventManager _dbObjectEventManager = new DBObjectEventManager();
 	private static DBOperationEventManager _dbOperationEventManager = new DBOperationEventManager();
 	private static DBOperationImplement _dbOperation = null;
+	private static DBObjectDatabase _databaseInfos = null;
 	private static boolean _connected = false;
 	public static boolean isConnected() {
 		return _connected;
@@ -58,7 +60,6 @@ public class DB2OntoPLWorkspaceTab extends OWLWorkspaceViewsTab{
 			checkConnect();
 		}
 		return _dbOperation;
-		
 	}
 	
 	public static void setDBOperationImplement(DBOperationImplement paramDBOperation) {
@@ -73,4 +74,10 @@ public class DB2OntoPLWorkspaceTab extends OWLWorkspaceViewsTab{
 		return _dbOperationEventManager;
 	}
 	
+	public static DBObjectDatabase getDatabaseInfos() {
+		if(_databaseInfos == null) {
+			_databaseInfos = new DBObjectDatabase();
+		}
+		return _databaseInfos;
+	}
 }

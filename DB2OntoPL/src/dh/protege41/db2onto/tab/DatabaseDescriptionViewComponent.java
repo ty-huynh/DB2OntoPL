@@ -14,6 +14,7 @@ import org.apache.log4j.Logger;
 import dh.protege41.db2onto.event.dbobject.DBObject;
 import dh.protege41.db2onto.event.dbobject.DBObjectDatabase;
 import dh.protege41.db2onto.event.dbobject.DBObjectEventType;
+import dh.protege41.db2onto.event.dbobject.DBObjectTable;
 import dh.protege41.db2onto.event.dboperation.DBOperationObject;
 import dh.protege41.db2onto.tab.ui.DatabasePanel;
 import dh.protege41.db2onto.tab.ui.util.list.DBList;
@@ -139,21 +140,24 @@ public class DatabaseDescriptionViewComponent extends DatabaseViewComponent {
 
 		public void resetDBListModel(DBObjectDatabase dbObject) {
 			List<Object> listObjects = new ArrayList<Object>();
-			listObjects.add(new DBListHeader(DBObjectDatabase.RELATIONS));
 			listObjects.add(new DBListHeader(DBObjectDatabase.PRODUCT_NAME));
 			listObjects.add(new DBListItem(dbObject.getProductName()));
-			listObjects.add(new DBListHeader(DBObjectDatabase.PRODUCT_VERSION));
-			listObjects.add(new DBListItem(dbObject.getProductVersion()));
+//			listObjects.add(new DBListHeader(DBObjectDatabase.PRODUCT_VERSION));
+//			listObjects.add(new DBListItem(dbObject.getProductVersion()));
 			listObjects.add(new DBListHeader(DBObjectDatabase.DRIVER_NAME));
 			listObjects.add(new DBListItem(dbObject.getDriverName()));
-			listObjects.add(new DBListHeader(DBObjectDatabase.DRIVER_VERSION));
-			listObjects.add(new DBListItem(dbObject.getDriverVersion()));
+//			listObjects.add(new DBListHeader(DBObjectDatabase.DRIVER_VERSION));
+//			listObjects.add(new DBListItem(dbObject.getDriverVersion()));
 //			listObjects.add(new DBListHeader(DBObjectDatabase.URL));
 //			listObjects.add(new DBListItem(dbObject.getUrl()));
 			listObjects.add(new DBListHeader(DBObjectDatabase.USERNAME));
 			listObjects.add(new DBListItem(dbObject.getUsername()));
 			listObjects.add(new DBListHeader(DBObjectDatabase.READONLY));
 			listObjects.add(new DBListItem(dbObject.isReadOnly()));
+			listObjects.add(new DBListHeader(DBObjectDatabase.TABLES));
+			for(DBObjectTable table : dbObject.getTables()) {
+				listObjects.add(new DBListItem(table.getName()));
+			}
 			dbList.setListObjects(listObjects);
 			dbList.revalidate();
 		}

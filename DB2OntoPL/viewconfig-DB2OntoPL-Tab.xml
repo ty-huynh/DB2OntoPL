@@ -3,32 +3,35 @@
     <VSNode splits="0.25 0.75">
         <CNode>
             <Component label="Database Detail">
-                <Property id="pluginId" value="dh.protege41.db2onto.new.DatabaseDetailViewComponent"/>
+                <Property id="pluginId" value="dh.protege41.db2onto.map.DatabaseDetailViewComponent"/>
             </Component>
 		    <Component label="Database Configure">
-                <Property id="pluginId" value="dh.protege41.db2onto.new.DatabaseConfigureViewComponent"/>
+                <Property id="pluginId" value="dh.protege41.db2onto.map.DatabaseConfigureViewComponent"/>
             </Component>
         </CNode>
-        <HSNode splits="0.375 0.625">
+        <HSNode splits="0.625 0.375">
 	        <CNode>
 	            <Component label="Database Records">
-	                <Property id="pluginId" value="dh.protege41.db2onto.new.DatabaseRecordsViewComponent"/>
+	                <Property id="pluginId" value="dh.protege41.db2onto.map.DatabaseRecordsViewComponent"/>
+	            </Component>
+	            <Component label="Database Mapping">
+	                <Property id="pluginId" value="dh.protege41.db2onto.map.DatabaseMappingViewComponent"/>
 	            </Component>
 	        </CNode>
 	        <VSNode splits="0.34 0.33 0.33">
 		        <CNode>
 		            <Component label="Database Description">
-		                <Property id="pluginId" value="dh.protege41.db2onto.new.DatabaseDescriptionViewComponent"/>
+		                <Property id="pluginId" value="dh.protege41.db2onto.map.DatabaseDescriptionViewComponent"/>
 		            </Component>
 		        </CNode>
 		        <CNode>
 		            <Component label="Table Description">
-		                <Property id="pluginId" value="dh.protege41.db2onto.new.DatabaseTableDescriptionViewComponent"/>
+		                <Property id="pluginId" value="dh.protege41.db2onto.map.DatabaseTableDescriptionViewComponent"/>
 		            </Component>
 		        </CNode>
 		        <CNode>
 		            <Component label="Column Description">
-		                <Property id="pluginId" value="dh.protege41.db2onto.new.DatabaseColumnDescriptionViewComponent"/>
+		                <Property id="pluginId" value="dh.protege41.db2onto.map.DatabaseColumnDescriptionViewComponent"/>
 		            </Component>
 		        </CNode>
 	        </VSNode>

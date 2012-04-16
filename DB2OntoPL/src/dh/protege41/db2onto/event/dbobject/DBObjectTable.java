@@ -9,7 +9,7 @@ public class DBObjectTable extends DBObject {
 	public static final String TABLE_SCHEM = "TABLE_SCHEM";//string dbo
 	public static final String TABLE_NAME = "TABLE_NAME"; //string name of table
 	public static final String TABLE_TYPE = "TABLE_TYPE";//string
-	
+	public static final String EXCEPT_TABLE = "sysdiagrams";
 	//header name
 	public static final String CATEGORY = "Category";
 	public static final String SCHEM = "Schem";

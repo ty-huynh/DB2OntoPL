@@ -68,6 +68,15 @@ public class DBObjectColumn extends DBObject {
 		}
 		this.isUnique = isUnique;
 	}
+	public String getNullableString() {
+		return (isNullable ? "YES" : "NO");
+	}
+	public String getPrimaryString() {
+		return (isPK ? "YES" : "NO");
+	}
+	public String getForeignString() {
+		return (isFK ? "YES" : "NO");
+	}
 //	public int getDataType() {
 //		return dataType;
 //	}

@@ -5,6 +5,7 @@ import org.protege.editor.owl.ui.view.AbstractOWLViewComponent;
 
 import dh.database.api.DBOperationImplement;
 import dh.protege41.db2onto.event.dbobject.DBObject;
+import dh.protege41.db2onto.event.dbobject.DBObjectDatabase;
 import dh.protege41.db2onto.event.dbobject.DBObjectEvent;
 import dh.protege41.db2onto.event.dbobject.DBObjectEventListener;
 import dh.protege41.db2onto.event.dboperation.DBOperationEvent;
@@ -80,6 +81,9 @@ public abstract class DatabaseViewComponent extends AbstractOWLViewComponent{
 	}
 	protected synchronized DBOperationImplement getDBOperationImpl() {
 		return DB2OntoPLWorkspaceTab.getDBOperationImplement();
+	}
+	protected synchronized DBObjectDatabase getDatabaseInfos() {
+		return DB2OntoPLWorkspaceTab.getDatabaseInfos();
 	}
 	protected synchronized DBObject getLastDisplayedDBObject() {
 		return _lastDisplayedDBObject;

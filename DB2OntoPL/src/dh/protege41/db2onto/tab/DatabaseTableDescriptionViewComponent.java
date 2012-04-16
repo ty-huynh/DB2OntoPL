@@ -12,6 +12,7 @@ import javax.swing.event.ListSelectionListener;
 import org.apache.log4j.Logger;
 
 import dh.protege41.db2onto.event.dbobject.DBObject;
+import dh.protege41.db2onto.event.dbobject.DBObjectColumn;
 import dh.protege41.db2onto.event.dbobject.DBObjectDatabase;
 import dh.protege41.db2onto.event.dbobject.DBObjectEventType;
 import dh.protege41.db2onto.event.dbobject.DBObjectTable;
@@ -141,13 +142,16 @@ public class DatabaseTableDescriptionViewComponent extends DatabaseViewComponent
 		
 		public void resetDBListModel(DBObjectTable dbObject) {
 			List<Object> listObjects = new ArrayList<Object>();
-			listObjects.add(new DBListHeader(DBObjectTable.COLUMNS));
 			listObjects.add(new DBListHeader(DBObjectTable.CATEGORY));
 			listObjects.add(new DBListItem(dbObject.getCategory()));
 			listObjects.add(new DBListHeader(DBObjectTable.SCHEM));
 			listObjects.add(new DBListItem(dbObject.getSchem()));
 			listObjects.add(new DBListHeader(DBObjectTable.TYPE));
 			listObjects.add(new DBListItem(dbObject.getType()));
+			listObjects.add(new DBListHeader(DBObjectTable.COLUMNS));
+			for(DBObjectColumn col : dbObject.getColumns()) {
+				listObjects.add(new DBListItem(col.getName()));
+			}
 			dbList.setListObjects(listObjects);
 			dbList.revalidate();
 		}

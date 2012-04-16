@@ -79,7 +79,16 @@
       <category value="@org.protege.ontologycategory"></category>
       <headerColor value="@org.protege.classcolor"/>
    </extension>
-   
+   <!--database mapping view component -->
+   <extension
+         id="DatabaseMappingViewComponent"
+         name="Database Mapping View Component"
+         point="org.protege.editor.core.application.ViewComponent">
+      <label value="Database Mapping"></label>
+      <class value="dh.protege41.db2onto.tab.DatabaseMappingViewComponent"></class>
+      <category value="@org.protege.ontologycategory"></category>
+      <headerColor value="@org.protege.classcolor"/>
+   </extension>
    <!-- Main workspace tab -->
    <extension
          id="DB2OntoPLWorkspaceTab"

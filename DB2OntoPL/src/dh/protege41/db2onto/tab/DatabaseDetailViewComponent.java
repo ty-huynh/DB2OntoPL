@@ -168,10 +168,12 @@ public class DatabaseDetailViewComponent extends DatabaseViewComponent {
 		public void buildDatabaseTree() {
 			try {
 				DatabaseMetaData meta = dbOperationImpl.getDatabaseMetaData();
-//				ResultSet rs = meta.getPrimaryKeys(null, null, "students");
+//				ResultSet rs = meta.getAttributes(null, null, new String[] {"TABLE"}, "%"); //(null, null, "students");
+//				log.info("get attributes");
 //				while (rs.next()) {
-//					String columnName = rs.getString("COLUMN_NAME");
-//					System.out.println("getPrimaryKeys(): columnName=" + columnName);
+//					log.info(rs);
+////					String columnName = rs.getString("COLUMN_NAME");
+////					System.out.println("getPrimaryKeys(): columnName=" + columnName);
 //				}
 
 				centerPanel.remove(scroll);
@@ -195,9 +197,7 @@ public class DatabaseDetailViewComponent extends DatabaseViewComponent {
 					while(rsColumns.next()) {
 						tableNode.add(new DBTreeNode(new DBObjectColumn(
 								rsColumns.getString(DBObjectColumn.COLUMN_NAME),
-								rsColumns.getString(DBObjectColumn.DATA_TYPE),
 								rsColumns.getString(DBObjectColumn.TYPE_NAME),
-								rsColumns.getString(DBObjectColumn.COLUMN_SIZE),
 								rsColumns.getString(DBObjectColumn.NULLABLE))));
 					}
 					root.add(tableNode);

@@ -103,7 +103,7 @@ public class DBOperationImplement implements DBOperation {
 		ResultSet rs = null;
 		try {
 			rs = getDatabaseMetaData().getTables(null, null, "%", new String[] {"TABLE"});
-			log.info("Get table done");
+//			log.info("Get table done");
 		} catch (SQLException e) {
 			log.info("Get table error");
 		}
@@ -113,7 +113,7 @@ public class DBOperationImplement implements DBOperation {
 		ResultSet rs = null;
 		try{
 			rs = getDatabaseMetaData().getColumns(null, null, table, "%");
-			log.info("Get columns done");
+//			log.info("Get columns done");
 		} catch(SQLException e) {
 			log.info("Get columns error");
 		}

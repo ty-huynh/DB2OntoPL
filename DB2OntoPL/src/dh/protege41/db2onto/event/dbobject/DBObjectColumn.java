@@ -22,66 +22,100 @@ public class DBObjectColumn extends DBObject {
 	public static final String COL_DATA_TYPE = "Data type";
 	public static final String COL_TYPE_NAME = "Type name";
 	public static final String COL_SIZE = "Size";
-	public static final String COL_NULL = "Is null";
+	public static final String COL_NULLABLE = "Is nullable";
 	public static final String COL_PK = "Is primary key";
 	public static final String COL_FK = "Is foreign key";
 	
-	private int dataType;
+//	private int dataType;
 	private String typeName;
-	private int size;
-	private boolean isNull;
-	
+//	private int size;
+	private boolean isNullable;
+	private boolean isUnique;
+	private boolean isFK;
+	private boolean isPK;
+//	private DBObjectTable table;
+
 	public DBObjectColumn() {
 		super(DBObjectType.DB_COLUMN_OBJECT, "Unknown");
 	}
 	public DBObjectColumn(String name) {
 		super(DBObjectType.DB_COLUMN_OBJECT, name);
 	}
-	public DBObjectColumn(
-			String name, 
-			String dataType, 
-			String typeName, 
-			String size, 
-			String isNull) {
+	public DBObjectColumn(String name, String typeName, String nullable) {
 		super(DBObjectType.DB_COLUMN_OBJECT, name);
+		this.typeName = typeName;
+//		this.table = table;
+		this.isFK = false;
+		this.isPK = false;
 		try{
-			this.dataType = Integer.parseInt(dataType);
-			this.typeName = typeName;
-			this.size = Integer.parseInt(size);
-			this.isNull = (Integer.parseInt(isNull) == 0) ? false : true;
-		} catch(Exception e) {
-			log.info("create column object error: convert error");
+			this.isNullable = ((Integer.parseInt(nullable)) == 0 ? false : true);
+		}catch(Exception e) {
+			
 		}
+		this.isUnique = false;
 	}
 	
-	public String isPrimaryKey() {
-		return (getTypeName().contains("identity") ? "YES" : "NO");
+	public DBObjectColumn(String name, String typeName, String nullable, boolean isUnique, boolean isPK, boolean isFK) {
+		super(DBObjectType.DB_COLUMN_OBJECT, name);
+		this.typeName = typeName;
+//		this.table = table;
+		this.isFK = isFK;
+		this.isPK = isPK;
+		try{
+			this.isNullable = ((Integer.parseInt(nullable)) == 0 ? false : true);
+		}catch(Exception e) {
+			
+		}
+		this.isUnique = isUnique;
 	}
-	
-	public int getDataType() {
-		return dataType;
-	}
-	public void setDataType(int dataType) {
-		this.dataType = dataType;
-	}
+//	public int getDataType() {
+//		return dataType;
+//	}
+//	public void setDataType(int dataType) {
+//		this.dataType = dataType;
+//	}
 	public String getTypeName() {
 		return typeName;
 	}
 	public void setTypeName(String typeName) {
 		this.typeName = typeName;
 	}
-	public int getSize() {
-		return size;
+//	public int getSize() {
+//		return size;
+//	}
+//	public void setSize(int size) {
+//		this.size = size;
+//	}
+	public boolean isNullable() {
+		return isNullable;
 	}
-	public void setSize(int size) {
-		this.size = size;
+	public void setNullable(boolean isNullable) {
+		this.isNullable = isNullable;
 	}
-	public String isNull() {
-		return (isNull ? "YES" : "NO");
+	public boolean isUnique() {
+		return isUnique;
 	}
-	public void setNull(boolean isNull) {
-		this.isNull = isNull;
+	public void setUnique(boolean isUnique) {
+		this.isUnique = isUnique;
 	}
+	public boolean isForeignKey() {
+		return isFK;
+	}
+	public void setForeignKey(boolean isFK) {
+		this.isFK = isFK;
+	}
+	public boolean isPrimaryKey() {
+		return isPK;
+	}
+	public void setPrimaryKey(boolean isPK) {
+		this.isPK = isPK;
+	}
+//	public DBObjectTable getTable() {
+//		return table;
+//	}
+//	public void setTable(DBObjectTable table) {
+//		this.table = table;
+//	}
 	
 	
 }

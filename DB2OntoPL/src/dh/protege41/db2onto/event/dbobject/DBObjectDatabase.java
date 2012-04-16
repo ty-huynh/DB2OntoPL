@@ -1,5 +1,9 @@
 package dh.protege41.db2onto.event.dbobject;
 
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+
 public class DBObjectDatabase extends DBObject {
 	
 	public static final String PRODUCT_NAME = "Product name";
@@ -18,6 +22,8 @@ public class DBObjectDatabase extends DBObject {
 	private String url;
 	private String username;
 	private boolean isReadOnly;
+	
+	private Set<DBObjectTable> tables = new HashSet<DBObjectTable>();
 	
 	public DBObjectDatabase() {
 		super(DBObjectType.DB_DATABASE_OBJECT, "Unknown");
@@ -43,7 +49,44 @@ public class DBObjectDatabase extends DBObject {
 		this.username = username;
 		this.isReadOnly = isReadOnly;
 	}
+	public DBObjectDatabase(
+			String name, 
+			String productName, 
+			String productVersion, 
+			String driverName, 
+			String driverVersion, 
+			String url, 
+			String username, 
+			boolean isReadOnly,
+			List<DBObjectTable> tables) {
+		super(DBObjectType.DB_DATABASE_OBJECT, name);
+		this.productName = productName;
+		this.productVersion = productVersion;
+		this.driverName = driverName;
+		this.driverVersion = driverVersion;
+		this.url = url;
+		this.username = username;
+		this.isReadOnly = isReadOnly;
+		this.tables.addAll(tables);
+	}
 	
+	public DBObjectTable getTableByName(String tabName) {
+		if(tabName == null)
+			return null;
+		for(DBObjectTable t : this.tables) {
+			if(tabName.equals(t.getName())) {
+				return t;
+			}
+		}
+		return null;
+	}
+	public void addTable(DBObjectTable table) {
+		for(DBObjectTable obj : this.tables) {
+			if(obj.getName().equals(table.getName()))
+				return;
+		}
+		this.tables.add(table);
+	}
 	
 	public String getProductName() {
 		return productName;
@@ -87,4 +130,11 @@ public class DBObjectDatabase extends DBObject {
 	public void setReadOnly(boolean isReadOnly) {
 		this.isReadOnly = isReadOnly;
 	}
+	public Set<DBObjectTable> getTables() {
+		return tables;
+	}
+	public void setTables(List<DBObjectTable> tables) {
+		this.tables.addAll(tables);
+	}
+	
 }

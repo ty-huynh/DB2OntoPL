@@ -146,9 +146,9 @@ public class DatabaseColumnDescriptionViewComponent extends DatabaseViewComponen
 			listObjects.add(new DBListHeader(DBObjectColumn.COL_TYPE_NAME));
 			listObjects.add(new DBListItem(dbObject.getTypeName()));
 			listObjects.add(new DBListHeader(DBObjectColumn.COL_SIZE));
-			listObjects.add(new DBListItem(dbObject.getSize()));
-			listObjects.add(new DBListHeader(DBObjectColumn.COL_NULL));
-			listObjects.add(new DBListItem(dbObject.isNull()));
+//			listObjects.add(new DBListItem(dbObject.getSize()));
+//			listObjects.add(new DBListHeader(DBObjectColumn.COL_NULL));
+			listObjects.add(new DBListItem(dbObject.isNullable()));
 			dbList.setListObjects(listObjects);
 			dbList.revalidate();
 		}

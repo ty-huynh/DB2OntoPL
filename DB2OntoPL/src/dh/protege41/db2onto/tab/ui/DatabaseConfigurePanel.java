@@ -200,12 +200,6 @@ class DatabaseConfigurePanel extends JPanel implements DatabasePanel {
 //		}
 //		DB2OntoPLWorkspaceTab.setDBOperationImplement(new DBOperationImplement(driver, url, databaseName, user, pass));
 	}
-
-	@Override
-	public void handleEvents(int event) {
-		// TODO Auto-generated method stub
-		
-	}
 	
 	public static void main(String args[]) {
 		JFrame frame = new JFrame("Design Test");

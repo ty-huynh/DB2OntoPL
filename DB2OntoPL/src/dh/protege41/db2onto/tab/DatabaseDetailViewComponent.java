@@ -48,19 +48,16 @@ public class DatabaseDetailViewComponent extends DatabaseViewComponent {
 	
 	@Override
 	protected void disposeOWLView() {
-		// TODO Auto-generated method stub
 		
 	}
 
 	@Override
 	protected void initialiseOWLView() throws Exception {
-		// TODO Auto-generated method stub
 		super.initialiseOWLView();
 		setLayout(new BorderLayout());
 		databaseDetailComponent = new DatabaseDetailPanel();
 		add(databaseDetailComponent, BorderLayout.CENTER);
 		log.info("database detail view component initialized!");
-		
 	}
 
 	@Override
@@ -75,7 +72,6 @@ public class DatabaseDetailViewComponent extends DatabaseViewComponent {
 	}
 	@Override
 	protected DBOperationObject performOperation() {
-		// TODO Auto-generated method stub
 		databaseDetailComponent.handleEvents(getLastPerformedDBOperation().getOperation());
 		return null;
 	}
@@ -88,15 +84,10 @@ public class DatabaseDetailViewComponent extends DatabaseViewComponent {
 		 */
 		private static final long serialVersionUID = 1L;
 
-		private JPanel topPanel;
 		private JPanel centerPanel;
 		
 		private JTreeComponent dbTree;
 		private JScrollPane scroll;
-		
-		private JButton btn1;
-		private JButton btn2;
-		private JButton btn3;
 		
 		private TreeSelectionListener treeSelectionListener;
 		
@@ -106,43 +97,22 @@ public class DatabaseDetailViewComponent extends DatabaseViewComponent {
 			initEventListeners();
 		}
 		
-		
 		@Override
 		public void initComponents() {
-			// TODO Auto-generated method stub
 			setLayout(new BorderLayout());
-			topPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
 			centerPanel = new JPanel(new GridLayout(1, 1));
 			centerPanel.setBackground(Color.WHITE);
 			
-			Vector<String> v1 = new JTreeNodeVector<String>("TWO", new String[] {"e1", "e2", "e3"});
-			Vector<Object> v2 = new JTreeNodeVector<Object>("THREE", new Object[] {"f1", "f2", "f3"});
-			v2.add(System.getProperties());
-			Object nodes[] = {v1, v2};
-			Vector<Object> v = new JTreeNodeVector<Object>("ROOT", nodes);
-			Vector<Object> rootVector = new JTreeNodeVector<Object>("ROOT", new Object[] {v});
-			
-			dbTree = new JTreeComponent(rootVector);
+			DBTreeNode root = new DBTreeNode(new DBObject("Database"));
+			dbTree = new JTreeComponent(root);
 			scroll = new JScrollPane(dbTree);
-			
-			btn1 = new JButton("One");
-			btn2 = new JButton("Two");
-			btn3 = new JButton("Thr");
 		}
 		
 		@Override
 		public void attachComponents() {
-			// TODO Auto-generated method stub
-			//add to top panel
-			topPanel.add(btn1);
-			topPanel.add(btn2);
-			topPanel.add(btn3);
-			
 			//add to center panel
 			centerPanel.add(scroll);
-			
 			//add to main panel
-			add(topPanel, BorderLayout.NORTH);
 			add(centerPanel, BorderLayout.CENTER);
 		}
 
@@ -156,11 +126,10 @@ public class DatabaseDetailViewComponent extends DatabaseViewComponent {
 		@Override
 		public void handleEvents(String event) {
 			if(event.equalsIgnoreCase(DBOperationEventType.DB_OPERATION_CONNECTED)) {
-				dbOperationImpl = DB2OntoPLWorkspaceTab.getDBOperationImplement();
+				dbOperationImpl = getDBOperationImpl();
 				processDatabaseMetaData();
 				buildDatabaseTree();
 			}
-//			log.info("Event: " + event);
 		}
 		/**
 		 * Process database meta data
@@ -218,15 +187,14 @@ public class DatabaseDetailViewComponent extends DatabaseViewComponent {
 				}
 				databaseInfos.classifyTable();
 			} catch (Exception e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+				log.info("Error: process database");
 			}
 		}
+		
 		/**
 		 * Create database info tree when connected to database
 		 */
 		public void buildDatabaseTree() {
-			
 			DBTreeNode root = new DBTreeNode(databaseInfos);
 			for(DBObjectTable table : databaseInfos.getTables()) {
 				DBTreeNode tableNode = new DBTreeNode(table);
@@ -236,8 +204,10 @@ public class DatabaseDetailViewComponent extends DatabaseViewComponent {
 				root.add(tableNode);
 			}
 			centerPanel.remove(scroll);
-			dbTree.removeTreeSelectionListener(treeSelectionListener);
-			dbTree.clear();
+			if(dbTree != null) {
+				dbTree.removeTreeSelectionListener(treeSelectionListener);
+				dbTree.clear();
+			}
 			dbTree = new JTreeComponent(root);
 			_initTreeSelectionEventHandler();
 			scroll = new JScrollPane(dbTree);
@@ -251,38 +221,19 @@ public class DatabaseDetailViewComponent extends DatabaseViewComponent {
 				
 				@Override
 				public void valueChanged(TreeSelectionEvent event) {
-					// TODO Auto-generated method stub
 					//get all nodes whose selection status has changed
 					TreePath[] paths = event.getPaths();
-					//
 					for(TreePath obj : paths) {
 						if(event.isAddedPath(obj)) {
 							DefaultMutableTreeNode node = (DefaultMutableTreeNode) obj.getLastPathComponent();
-//							log.info(((DBObject)node.getUserObject()).getType());
 							DatabaseViewComponent.setGlobalSelectionObject((DBObject)node.getUserObject());
 						} else {
 							DefaultMutableTreeNode node = (DefaultMutableTreeNode) obj.getLastPathComponent();
-//							log.info(((DBObject)node.getUserObject()).getName());
 						}
 					}
-					
 				}
 			};
 			dbTree.addTreeSelectionListener(treeSelectionListener);
-			log.info("setup listener for tree selection event");
-		}
-		
-		public void setDBTree(JTreeComponent newTree) {
-			dbTree = newTree;
-		}
-		public JTreeComponent getDBTree() {
-			return dbTree;
-		}
-
-		@Override
-		public void handleEvents(int event) {
-			// TODO Auto-generated method stub
-			
 		}
 	}
 }

@@ -214,12 +214,6 @@ public class DatabaseExEditorPanel extends JPanel implements DatabasePanel {
 		_handleSaveIndividuals();
 	}
 
-	@Override
-	public void handleEvents(int event) {
-		// TODO Auto-generated method stub
-		
-	}
-	
 	private void _handleSaveIndividuals() {
 		
 		try {
@@ -367,12 +361,6 @@ public class DatabaseExEditorPanel extends JPanel implements DatabasePanel {
 
 		@Override
 		public void handleEvents(String event) {
-			// TODO Auto-generated method stub
-			
-		}
-
-		@Override
-		public void handleEvents(int event) {
 			// TODO Auto-generated method stub
 			
 		}

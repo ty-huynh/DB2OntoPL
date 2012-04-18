@@ -22,7 +22,6 @@ public abstract class DatabaseViewComponent extends AbstractOWLViewComponent{
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
-
 	private static final Logger log = Logger.getLogger(DatabaseViewComponent.class);
 	
 	private DBObjectEventListener _objectListener;
@@ -30,6 +29,7 @@ public abstract class DatabaseViewComponent extends AbstractOWLViewComponent{
 	private DBObject _lastDisplayedDBObject;
 	private DBOperationObject _lastPerformedDBOperation;
 	private String _header;
+	
 	@Override
 	protected void disposeOWLView() {
 		// TODO Auto-generated method stub
@@ -82,6 +82,10 @@ public abstract class DatabaseViewComponent extends AbstractOWLViewComponent{
 	protected synchronized DBOperationImplement getDBOperationImpl() {
 		return DB2OntoPLWorkspaceTab.getDBOperationImplement();
 	}
+	protected synchronized void setDBOperationImpl(DBOperationImplement operationImpl) {
+		DB2OntoPLWorkspaceTab.setDBOperationImplement(operationImpl);
+	}
+	
 	protected synchronized DBObjectDatabase getDatabaseInfos() {
 		return DB2OntoPLWorkspaceTab.getDatabaseInfos();
 	}
@@ -94,4 +98,5 @@ public abstract class DatabaseViewComponent extends AbstractOWLViewComponent{
 	protected synchronized static void setGlobalSelectionObject(DBObject dbObject) {
 		DB2OntoPLWorkspaceTab.getDBObjectEventManager().changeDBObject(dbObject);
 	}
+
 }

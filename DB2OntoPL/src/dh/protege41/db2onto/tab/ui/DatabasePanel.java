@@ -14,6 +14,5 @@ public interface DatabasePanel {
 	public void attachComponents();
 	public void initEventListeners();
 	public void handleEvents(String event);
-	public void handleEvents(int event);
 	
 }

@@ -164,12 +164,6 @@ public class DatabaseRecordsViewComponent extends DatabaseViewComponent {
 		}
 
 		@Override
-		public void handleEvents(int event) {
-			// TODO Auto-generated method stub
-			
-		}
-
-		@Override
 		public void handleEvents(String event) {
 			// TODO Auto-generated method stub
 			if(event.equals(DBObjectEventType.DB_OBJECT_SELECTION_CHANGED)) {

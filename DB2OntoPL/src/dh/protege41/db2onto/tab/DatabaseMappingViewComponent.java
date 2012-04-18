@@ -138,15 +138,12 @@ public class DatabaseMappingViewComponent extends DatabaseViewComponent {
 		@Override
 		public void attachComponents() {
 			bottomPanel.add(btnImport);
-//			this.add(new JScrollPane(mappingConfigPanel), BorderLayout.WEST);
-//			this.add(new JScrollPane(mappingConfigPanel), BorderLayout.EAST);
-//			this.add(new JScrollPane(classSelector), BorderLayout.WEST);
 			mainPanel.add(new JScrollPane(mappingConfigPanel), BorderLayout.WEST);
 			JPanel pnClass = new JPanel(new GridBagLayout());
 			formUtil.addLastField(new JLabel("Select super class"), pnClass);
 			formUtil.addLastField(new JScrollPane(classSelector), pnClass);
-			mainPanel.add(pnClass, BorderLayout.EAST);
-			mainPanel.add(new JScrollPane(tableSelector), BorderLayout.CENTER);
+			mainPanel.add(pnClass, BorderLayout.CENTER);
+//			mainPanel.add(new JScrollPane(tableSelector), BorderLayout.CENTER);
 			
 			this.add(new JScrollPane(mainPanel), BorderLayout.CENTER);
 			this.add(bottomPanel, BorderLayout.SOUTH);
@@ -171,12 +168,6 @@ public class DatabaseMappingViewComponent extends DatabaseViewComponent {
 			}
 		}
 
-		@Override
-		public void handleEvents(int event) {
-			// TODO Auto-generated method stub
-			
-		}
-		
 		private void _handleMapping() {
 			try{
 				OWLOperationImpl owlFactory = new OWLOperationImpl(getOWLEditorKit());
@@ -373,13 +364,6 @@ public class DatabaseMappingViewComponent extends DatabaseViewComponent {
 			// TODO Auto-generated method stub
 			
 		}
-
-		@Override
-		public void handleEvents(int event) {
-			// TODO Auto-generated method stub
-			
-		}
-		
 	}
 	
 	class TableSelectorPanel extends JPanel implements DatabasePanel {
@@ -440,12 +424,5 @@ public class DatabaseMappingViewComponent extends DatabaseViewComponent {
 			// TODO Auto-generated method stub
 			
 		}
-
-		@Override
-		public void handleEvents(int event) {
-			// TODO Auto-generated method stub
-			
-		}
-		
 	}
 }

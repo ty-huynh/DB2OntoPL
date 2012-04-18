@@ -133,12 +133,6 @@ public class DatabaseRecordsPanel extends JPanel implements DatabasePanel {
 	}
 
 	@Override
-	public void handleEvents(int event) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
 	public void handleEvents(String event) {
 		// TODO Auto-generated method stub
 		

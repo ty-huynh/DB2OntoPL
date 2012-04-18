@@ -84,13 +84,6 @@ public class DatabaseDetailPanel extends JPanel implements DatabasePanel {
 		
 	}
 
-
-	@Override
-	public void handleEvents(int event) {
-		// TODO Auto-generated method stub
-		
-	}
-	
 	public void setDBTree(JTreeComponent newTree) {
 		dbTree = newTree;
 	}

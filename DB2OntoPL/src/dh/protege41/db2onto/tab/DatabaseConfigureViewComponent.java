@@ -2,6 +2,7 @@ package dh.protege41.db2onto.tab;
 
 import java.awt.BorderLayout;
 import java.awt.FlowLayout;
+import java.awt.GridBagLayout;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -13,6 +14,8 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JPasswordField;
+import javax.swing.JScrollPane;
 import javax.swing.JTextField;
 
 import org.apache.log4j.Logger;
@@ -24,6 +27,8 @@ import dh.protege41.db2onto.event.dbobject.DBObject;
 import dh.protege41.db2onto.event.dboperation.DBOperationEventType;
 import dh.protege41.db2onto.event.dboperation.DBOperationObject;
 import dh.protege41.db2onto.tab.ui.DatabasePanel;
+import dh.protege41.db2onto.tab.ui.util.form.FormUtility;
+import dh.protege41.db2onto.tab.ui.util.panel.PanelUtil;
 
 public class DatabaseConfigureViewComponent extends DatabaseViewComponent {
 	/**
@@ -87,12 +92,13 @@ public class DatabaseConfigureViewComponent extends DatabaseViewComponent {
 		private JTextField tfHost;
 		private JTextField tfPort;
 		private JTextField tfUsername;
-		private JTextField tfPassword;
+		private JPasswordField tfPassword;
 		
 		private JButton btnChange;
 		private JButton btnConnect;
 		private JButton btnCancel;
 		
+		private FormUtility formUtil = new FormUtility();
 		public DatabaseConfigurePanel() {
 			initComponents();
 			attachComponents();
@@ -101,11 +107,11 @@ public class DatabaseConfigureViewComponent extends DatabaseViewComponent {
 		
 		public void initComponents() {
 			setLayout(new BorderLayout());
-			panelCenter = new JPanel(new GridLayout(14, 0, 5, 5));
+			panelCenter = new JPanel(new GridBagLayout());
 			panelBottom = new JPanel(new FlowLayout(FlowLayout.CENTER));
 			
 			cbbDBType = new JComboBox(DBEnumType.getAllDBTypes());
-			cbbDBType.setSelectedIndex(0);
+			cbbDBType.setSelectedItem(DBEnumType.SQLSERVER.getType());
 			
 			tfDriver = new JTextField(DBEnumType.getDBEnumByType((String)cbbDBType.getSelectedItem()).getDriver(), 30);
 			
@@ -113,7 +119,7 @@ public class DatabaseConfigureViewComponent extends DatabaseViewComponent {
 			tfHost = new JTextField("localhost", 30);
 			tfPort = new JTextField("1433", 30);
 			tfUsername = new JTextField("sa", 30);
-			tfPassword = new JTextField("12345", 30);
+			tfPassword = new JPasswordField("12345", 30);
 			
 			btnChange = new JButton("Change");
 			btnConnect = new JButton("Connect");
@@ -122,30 +128,43 @@ public class DatabaseConfigureViewComponent extends DatabaseViewComponent {
 		
 		public void attachComponents() {
 			//attach components to center panel
-			panelCenter.add(new JLabel("Database Type"));
-			panelCenter.add(cbbDBType);
-			panelCenter.add(new JLabel("JDBC Driver Class Name (required)"));
-			panelCenter.add(tfDriver);
-			panelCenter.add(new JLabel("Database Name (ex. access: c:\\folder\\db.mdb)"));
-			panelCenter.add(tfDBName);
-			panelCenter.add(new JLabel("Host (work for mysql, sqlserver)"));
-			panelCenter.add(tfHost);
-			panelCenter.add(new JLabel("Port (work for mysql, sqlserver)"));
-			panelCenter.add(tfPort);
-			panelCenter.add(new JLabel("Username"));
-			panelCenter.add(tfUsername);
-			panelCenter.add(new JLabel("Password"));
-			panelCenter.add(tfPassword);
+			formUtil.addLastField(new JLabel("Database Type"), panelCenter);
+			formUtil.addLastField(cbbDBType, panelCenter);
+			formUtil.addLastField(new JLabel("JDBC Driver Class Name (required)"), panelCenter);
+			formUtil.addLastField(tfDriver, panelCenter);
+			formUtil.addLastField(new JLabel("Database Name (ex. access: c:\\folder\\db.mdb)"), panelCenter);
+			formUtil.addLastField(tfDBName, panelCenter);
+			formUtil.addLastField(new JLabel("Host (work for mysql, sqlserver)"), panelCenter);
+			formUtil.addLastField(tfHost, panelCenter);
+			formUtil.addLastField(new JLabel("Port (work for mysql, sqlserver)"), panelCenter);
+			formUtil.addLastField(tfPort, panelCenter);
+			formUtil.addLastField(new JLabel("Username"), panelCenter);
+			formUtil.addLastField(tfUsername, panelCenter);
+			formUtil.addLastField(new JLabel("Password"), panelCenter);
+			formUtil.addLastField(tfPassword, panelCenter);
+//			panelCenter.add(new JLabel("Database Type"));
+//			panelCenter.add(cbbDBType);
+//			panelCenter.add(new JLabel("JDBC Driver Class Name (required)"));
+//			panelCenter.add(tfDriver);
+//			panelCenter.add(new JLabel("Database Name (ex. access: c:\\folder\\db.mdb)"));
+//			panelCenter.add(tfDBName);
+//			panelCenter.add(new JLabel("Host (work for mysql, sqlserver)"));
+//			panelCenter.add(tfHost);
+//			panelCenter.add(new JLabel("Port (work for mysql, sqlserver)"));
+//			panelCenter.add(tfPort);
+//			panelCenter.add(new JLabel("Username"));
+//			panelCenter.add(tfUsername);
+//			panelCenter.add(new JLabel("Password"));
+//			panelCenter.add(tfPassword);
 			
 			//attach components to bottom panel
 			panelBottom.add(btnChange);
 			panelBottom.add(btnConnect);
-			panelBottom.add(btnCancel);
-			
+//			panelBottom.add(btnCancel);
 			//attach components to main panel
-			add(panelCenter, BorderLayout.CENTER);
+			add(PanelUtil.createScroll(PanelUtil.createJPanelBorderLayout(panelCenter, BorderLayout.NORTH)), BorderLayout.CENTER);
 			add(panelBottom, BorderLayout.SOUTH);
-			
+			enableDisconnectedComponents();
 		}
 		
 		
@@ -184,29 +203,28 @@ public class DatabaseConfigureViewComponent extends DatabaseViewComponent {
 				
 				@Override
 				public void actionPerformed(ActionEvent e) {
-					// TODO Auto-generated method stub
 					handleEvents(DBOperationEventType.DB_OPERATION_CANCEL);
 				}
 			});
 		}
-		
 
 		@Override
 		public void handleEvents(String event) {
-			// TODO Auto-generated method stub
 			if(event.equals(DBOperationEventType.DB_OPERATION_CONNECT)) {
+				enableConnectingComponents();
 				Thread t = new Thread(new Runnable() {
 					
 					@Override
 					public void run() {
-						// TODO Auto-generated method stub
 						setupConnectionDatabase();
 					}
 				});
 				t.start();
+			} else if(DBOperationEventType.DB_OPERATION_DISCONNECT.equals(event)) {
+				enableDisconnectedComponents();
+			} else if(DBOperationEventType.DB_OPERATION_CONNECTED.equals(event)) {
+				enableConnectedComponents();
 			}
-			
-			putMessages("Event " + event);
 		}
 		
 		public void putMessages(String message) {
@@ -227,17 +245,17 @@ public class DatabaseConfigureViewComponent extends DatabaseViewComponent {
 			} else if(dbType.equalsIgnoreCase(DBEnumType.SQLSERVER.getType())) {
 				url = "jdbc:sqlserver://" + tfHost.getText().trim() + ":" + tfPort.getText().trim() + ";databaseName=" + databaseName + ";selectMethod=cursor";
 			}
-			if(DB2OntoPLWorkspaceTab.getDBOperationImplement() != null) {
+			if(getDBOperationImpl() != null) {
 				try {
-					DB2OntoPLWorkspaceTab.getDBOperationImplement().close();
+					getDBOperationImpl().close();
 				} catch (SQLException e) {
 					log.info("can not close connection");
 				}
-				DB2OntoPLWorkspaceTab.setDBOperationImplement(null);
+				setDBOperationImpl(null);
 			}
-			DB2OntoPLWorkspaceTab.setDBOperationImplement(new DBOperationImplement(driver, url, databaseName, user, pass));
+			setDBOperationImpl(new DBOperationImplement(driver, url, databaseName, user, pass));
 			try {
-				DB2OntoPLWorkspaceTab.getDBOperationImplement().createConnection();
+				getDBOperationImpl().createConnection();
 				DB2OntoPLWorkspaceTab.setConnectStatus(true);
 				setGlobalDBOperationObject(new DBOperationObject(DBOperationEventType.DB_OPERATION_CONNECTED));
 				log.info("connected");
@@ -247,10 +265,42 @@ public class DatabaseConfigureViewComponent extends DatabaseViewComponent {
 			}
 		}
 
-		@Override
-		public void handleEvents(int event) {
-			// TODO Auto-generated method stub
-			
+		public void enableConnectingComponents() {
+			btnConnect.setText("Connecting ... ");
+			cbbDBType.setEnabled(false);
+			tfDriver.setEnabled(false);
+			tfDBName.setEnabled(false);
+			tfHost.setEnabled(false);
+			tfPort.setEnabled(false);
+			tfUsername.setEnabled(false);
+			tfPassword.setEnabled(false);
+			this.revalidate();
+		}
+		
+		public void enableConnectedComponents() {
+			btnChange.setEnabled(true);
+			btnConnect.setText("Disconnect");
+			cbbDBType.setEnabled(false);
+			tfDriver.setEnabled(false);
+			tfDBName.setEnabled(false);
+			tfHost.setEnabled(false);
+			tfPort.setEnabled(false);
+			tfUsername.setEnabled(false);
+			tfPassword.setEnabled(false);
+			this.revalidate();
+		}
+		
+		public void enableDisconnectedComponents() {
+			btnChange.setEnabled(false);
+			btnConnect.setText("Connect");
+			cbbDBType.setEnabled(true);
+			tfDriver.setEnabled(true);
+			tfDBName.setEnabled(true);
+			tfHost.setEnabled(true);
+			tfPort.setEnabled(true);
+			tfUsername.setEnabled(true);
+			tfPassword.setEnabled(true);
+			this.revalidate();
 		}
 	}//end class DatabaseConfigurePanel
 	

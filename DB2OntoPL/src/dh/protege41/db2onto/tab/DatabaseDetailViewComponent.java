@@ -216,6 +216,7 @@ public class DatabaseDetailViewComponent extends DatabaseViewComponent {
 						databaseInfos.getTableByName(fk.getFKTable()).getColumnByName(fk.getFKColumn()).setForeignKey(true);
 					}
 				}
+				databaseInfos.classifyTable();
 			} catch (Exception e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();

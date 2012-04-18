@@ -1,14 +1,25 @@
 package dh.protege41.db2onto.owl;
 
+import java.io.File;
+import java.io.UnsupportedEncodingException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URL;
+import java.net.URLEncoder;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
+import javax.swing.JComboBox;
+
+import org.apache.log4j.Logger;
 import org.protege.editor.owl.OWLEditorKit;
 import org.protege.editor.owl.model.OWLModelManager;
 import org.protege.editor.owl.model.entity.OWLEntityCreationException;
 import org.protege.editor.owl.model.entity.OWLEntityCreationSet;
 import org.protege.editor.owl.model.entity.OWLEntityFactory;
+import org.protege.editor.owl.model.util.OWLDataTypeUtils;
+import org.protege.editor.owl.ui.UIHelper;
 import org.semanticweb.owlapi.model.AddAxiom;
 import org.semanticweb.owlapi.model.IRI;
 import org.semanticweb.owlapi.model.OWLAnnotationAssertionAxiom;
@@ -18,22 +29,44 @@ import org.semanticweb.owlapi.model.OWLAnnotationValue;
 import org.semanticweb.owlapi.model.OWLAxiom;
 import org.semanticweb.owlapi.model.OWLClass;
 import org.semanticweb.owlapi.model.OWLClassAssertionAxiom;
+import org.semanticweb.owlapi.model.OWLClassExpression;
 import org.semanticweb.owlapi.model.OWLDataFactory;
+import org.semanticweb.owlapi.model.OWLDataMaxCardinality;
+import org.semanticweb.owlapi.model.OWLDataMinCardinality;
+import org.semanticweb.owlapi.model.OWLDataProperty;
+import org.semanticweb.owlapi.model.OWLDataPropertyDomainAxiom;
+import org.semanticweb.owlapi.model.OWLDataPropertyExpression;
+import org.semanticweb.owlapi.model.OWLDataPropertyRangeAxiom;
+import org.semanticweb.owlapi.model.OWLDataRange;
 import org.semanticweb.owlapi.model.OWLDatatype;
 import org.semanticweb.owlapi.model.OWLEntity;
 import org.semanticweb.owlapi.model.OWLIndividual;
+import org.semanticweb.owlapi.model.OWLInverseObjectPropertiesAxiom;
 import org.semanticweb.owlapi.model.OWLNamedIndividual;
+import org.semanticweb.owlapi.model.OWLObjectMaxCardinality;
+import org.semanticweb.owlapi.model.OWLObjectMinCardinality;
+import org.semanticweb.owlapi.model.OWLObjectProperty;
+import org.semanticweb.owlapi.model.OWLObjectPropertyDomainAxiom;
+import org.semanticweb.owlapi.model.OWLObjectPropertyExpression;
+import org.semanticweb.owlapi.model.OWLObjectPropertyRangeAxiom;
 import org.semanticweb.owlapi.model.OWLOntology;
 import org.semanticweb.owlapi.model.OWLOntologyChange;
+import org.semanticweb.owlapi.model.OWLOntologyCreationException;
+import org.semanticweb.owlapi.model.OWLOntologyID;
+import org.semanticweb.owlapi.model.OWLSubClassOfAxiom;
 import org.semanticweb.owlapi.vocab.OWL2Datatype;
 
 public class OWLOperationImpl implements OWLOperation {
+	
+	private static final Logger log = Logger.getLogger(OWLOperationImpl.class);
+	
 	private OWLEditorKit _owlEditorKit;
 	private OWLModelManager _owlModelManager;
 	private OWLEntityFactory _owlEntityFactory;
 	private OWLDataFactory _owlDataFactory;
-	private OWLOntology _activeOntology;
+//	private OWLOntology _activeOntology;
 	private List<OWLOntologyChange> operations = new ArrayList<OWLOntologyChange>();
+	
 	
 	public OWLOperationImpl() {
 	}
@@ -43,7 +76,7 @@ public class OWLOperationImpl implements OWLOperation {
 		_owlModelManager = _owlEditorKit.getOWLModelManager();
 		_owlEntityFactory = _owlModelManager.getOWLEntityFactory();
 		_owlDataFactory = _owlModelManager.getOWLDataFactory();
-		_activeOntology = _owlModelManager.getActiveOntology();
+//		_activeOntology = _owlModelManager.getActiveOntology();
 	}
 
 	@Override
@@ -145,12 +178,31 @@ public class OWLOperationImpl implements OWLOperation {
 
 	@Override
 	public IRI getBaseIRI() {
-		return _activeOntology.getOntologyID().getOntologyIRI();
+		return _owlModelManager.getActiveOntology().getOntologyID().getOntologyIRI();
 	}
 
+	@SuppressWarnings("unchecked")
+	public IRI getDataTypeBaseIRI() {
+		List datatypeList = new ArrayList(new OWLDataTypeUtils(_owlModelManager.getOWLOntologyManager()).getKnownDatatypes(_owlModelManager.getActiveOntologies()));
+		Iterator loop = datatypeList.iterator();
+		while(loop.hasNext()) {
+			Object o = loop.next();
+			if(o instanceof OWLDatatype) {
+				if(((OWLDatatype)o).isInteger()) {
+					OWLDatatype dt = ((OWLDatatype)o);
+					log.info("iri: " + dt.getIRI());
+					String iri = dt.getIRI().toString().substring(0, dt.getIRI().toString().indexOf('#'));
+					log.info("" + iri);
+					return IRI.create(iri);
+				}
+			}
+		}
+		return null;
+	}
+	
 	@Override
 	public OWLOntologyChange createOWLOntologyChange(OWLAxiom axiom) {
-		return new AddAxiom(_activeOntology, axiom);
+		return new AddAxiom(_owlModelManager.getActiveOntology(), axiom);
 	}
 
 	@Override
@@ -171,5 +223,137 @@ public class OWLOperationImpl implements OWLOperation {
 	
 	public List<OWLOntologyChange> getOWLOperations() {
 		return operations;
+	}
+	
+	public OWLOntology createNewOntology(OWLOntologyID ontoID, URI location) {
+		try {
+			return _owlModelManager.createNewOntology(ontoID, location);
+		} catch (OWLOntologyCreationException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return null;
+	}
+	/**
+	 * create new ontology
+	 * @return
+	 */
+	public OWLOntology createNewOntology() {
+		try {
+			log.info(_owlModelManager.getActiveOntology().getOntologyID());
+			String ontoName = "Ontology_creation.owl";
+			OWLOntologyID ontoID = new OWLOntologyID(IRI.create(new URI("http://www.semanticweb.org/ontologies/2012/3/17/" + ontoName)));
+			File file = new File("E:\\ty\\ontologies\\" + ontoName);
+			log.info(file);
+			log.info("ontology iri: " + ontoID);
+			log.info("ontology location: " + file.toURI());
+			return _owlModelManager.createNewOntology(ontoID, file.toURI());
+		} catch (OWLOntologyCreationException e) {
+			log.info("create ontology exception");
+			e.printStackTrace();
+		} catch (URISyntaxException e1) {
+			log.info("URI error");
+			e1.printStackTrace();
+		}
+		return null;
+	}
+	/* CLASSES */
+	/**
+	 * create new owl class
+	 * @throws OWLEntityCreationException 
+	 */
+	public OWLEntityCreationSet<OWLClass> createOWLClass(String className, IRI baseIRI) throws OWLEntityCreationException {
+		if(baseIRI == null) {
+			baseIRI = getBaseIRI();
+		}
+		return _owlEntityFactory.createOWLClass(className, baseIRI);
+	}
+	
+	/**
+	 * create new owl class
+	 * @throws OWLEntityCreationException 
+	 */
+	public OWLEntityCreationSet<OWLClass> createOWLClass(String className) throws OWLEntityCreationException {
+		return this.createOWLClass(className, null);
+	}
+	
+	public OWLClass getOWLClass(String className) throws URISyntaxException {
+		IRI clsIRI = IRI.create(new URI(getBaseIRI() + "#" + className));
+		return _owlDataFactory.getOWLClass(clsIRI);
+	}
+	
+	public OWLSubClassOfAxiom getSubClassAxiom(OWLClass sub, OWLClass sup) {
+		return _owlDataFactory.getOWLSubClassOfAxiom(sub, sup);
+	}
+	
+	public OWLSubClassOfAxiom getSubClassAxiom(String subClass, String supClass) throws URISyntaxException {
+		return this.getSubClassAxiom(getOWLClass(subClass), getOWLClass(supClass));
+	}
+	
+	/* PROPERTIES */
+	public OWLEntityCreationSet<OWLObjectProperty> createOWLObjectProperty(String propName, IRI baseIRI) throws OWLEntityCreationException {
+		if(baseIRI == null) {
+			baseIRI = getBaseIRI();
+		}
+		return _owlEntityFactory.createOWLObjectProperty(propName, baseIRI);
+	}
+	
+	public OWLEntityCreationSet<OWLObjectProperty> createOWLObjectProperty(String propName) throws OWLEntityCreationException {
+		return this.createOWLObjectProperty(propName, null);
+	}
+	
+	public OWLEntityCreationSet<OWLDataProperty> createOWLDataProperty(String propName, IRI baseIRI) throws OWLEntityCreationException {
+		if(baseIRI == null) {
+			baseIRI = getBaseIRI();
+		}
+		return _owlEntityFactory.createOWLDataProperty(propName, baseIRI);
+	}
+	
+	public OWLEntityCreationSet<OWLDataProperty> createOWLDataProperty(String propName) throws OWLEntityCreationException {
+		return this.createOWLDataProperty(propName, null);
+	}
+	
+	public OWLObjectPropertyDomainAxiom getObjectPropertyDomainAxiom(OWLObjectPropertyExpression prop, OWLClassExpression cls) {
+		return _owlDataFactory.getOWLObjectPropertyDomainAxiom(prop, cls);
+	}
+	
+	public OWLObjectPropertyRangeAxiom getObjectPropertyRangeAxiom(OWLObjectPropertyExpression prop, OWLClassExpression cls) {
+		return _owlDataFactory.getOWLObjectPropertyRangeAxiom(prop, cls);
+	}
+	
+	public OWLDataPropertyDomainAxiom getDataPropertyDomainAxiom(OWLDataPropertyExpression prop, OWLClass cls) {
+		return _owlDataFactory.getOWLDataPropertyDomainAxiom(prop, cls);
+	}
+	
+	public OWLDataRange getDataRange(IRI iri) {
+		return _owlDataFactory.getOWLDatatype(iri);
+	}
+	
+	public OWLDataRange getDataRange(String iri) {
+		return this.getDataRange(IRI.create(iri));
+	}
+	
+	public OWLDataPropertyRangeAxiom getDataPropertyRangeAxiom(OWLDataPropertyExpression prop, OWLDataRange range) {
+		return _owlDataFactory.getOWLDataPropertyRangeAxiom(prop, range);
+	}
+	
+	public OWLInverseObjectPropertiesAxiom getInverseObjectPropertiesAxiom(OWLObjectPropertyExpression propForward, OWLObjectPropertyExpression propInverse) {
+		return _owlDataFactory.getOWLInverseObjectPropertiesAxiom(propForward, propInverse);
+	}
+	
+	public OWLObjectMinCardinality getObjectMinCardinality(int cardinality, OWLObjectPropertyExpression prop) {
+		return _owlDataFactory.getOWLObjectMinCardinality(cardinality, prop);
+	}
+	
+	public OWLObjectMaxCardinality getObjectMaxCardinality(int cardinality, OWLObjectPropertyExpression prop) {
+		return _owlDataFactory.getOWLObjectMaxCardinality(cardinality, prop);
+	}
+	
+	public OWLDataMinCardinality getDataMinCardinality(int cardinality, OWLDataPropertyExpression dataProp) {
+		return _owlDataFactory.getOWLDataMinCardinality(cardinality, dataProp);
+	}
+	
+	public OWLDataMaxCardinality getDataMaxCardinality(int cardinality, OWLDataPropertyExpression dataProp) {
+		return _owlDataFactory.getOWLDataMaxCardinality(cardinality, dataProp);
 	}
 }

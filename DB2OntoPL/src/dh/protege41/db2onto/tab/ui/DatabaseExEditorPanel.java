@@ -354,7 +354,15 @@ public class DatabaseExEditorPanel extends JPanel implements DatabasePanel {
 		@Override
 		public void initEventListeners() {
 			// TODO Auto-generated method stub
-			
+			this.cbbType.addActionListener(new ActionListener() {
+				
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					// TODO Auto-generated method stub
+					OWLDatatype dt = (OWLDatatype)cbbType.getSelectedItem();
+					log.info("datatype iri: " + dt.getIRI());
+				}
+			});
 		}
 
 		@Override

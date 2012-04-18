@@ -109,7 +109,7 @@ public class DatabaseConfigureViewComponent extends DatabaseViewComponent {
 			
 			tfDriver = new JTextField(DBEnumType.getDBEnumByType((String)cbbDBType.getSelectedItem()).getDriver(), 30);
 			
-			tfDBName = new JTextField("DBTest", 30);
+			tfDBName = new JTextField("School", 30);
 			tfHost = new JTextField("localhost", 30);
 			tfPort = new JTextField("1433", 30);
 			tfUsername = new JTextField("sa", 30);

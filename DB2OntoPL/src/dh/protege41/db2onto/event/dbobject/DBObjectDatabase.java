@@ -1,5 +1,8 @@
 package dh.protege41.db2onto.event.dbobject;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -23,7 +26,7 @@ public class DBObjectDatabase extends DBObject {
 	private String username;
 	private boolean isReadOnly;
 	
-	private Set<DBObjectTable> tables = new HashSet<DBObjectTable>();
+	private List<DBObjectTable> tables = new ArrayList<DBObjectTable>();
 	
 	public DBObjectDatabase() {
 		super(DBObjectType.DB_DATABASE_OBJECT, "Unknown");
@@ -80,6 +83,7 @@ public class DBObjectDatabase extends DBObject {
 		}
 		return null;
 	}
+	
 	public void addTable(DBObjectTable table) {
 		for(DBObjectTable obj : this.tables) {
 			if(obj.getName().equals(table.getName()))
@@ -87,6 +91,31 @@ public class DBObjectDatabase extends DBObject {
 		}
 		this.tables.add(table);
 	}
+	
+	public void classifyTable() {
+		for(DBObjectTable table : this.tables) {
+			//case 1
+			if((table.getForeignKeys().size() == table.getColumns().size()) || (table.getPrimaryKeys().size() == table.getColumns().size())) {
+				table.setTableCase(DBObjectType.CASE_1);
+//				log.info("table  " + table.getName() + " in case " + table.getTableCase());
+				continue;
+			}
+			boolean isCase2 = true;
+			for(DBObjectPrimaryKey pk : table.getPrimaryKeys()) {
+				DBObjectColumn colPK = table.getColumnByName(pk.getColumn());
+				if(!colPK.isForeignKey()) {
+					isCase2 = false;
+					//case 3
+					table.setTableCase(DBObjectType.CASE_3);
+					break;
+				}
+			}
+			//case 2
+			if(isCase2) table.setTableCase(DBObjectType.CASE_2);
+//			log.info("table  " + table.getName() + " in case " + table.getTableCase());
+		}
+	}
+	
 	
 	public String getProductName() {
 		return productName;
@@ -130,11 +159,13 @@ public class DBObjectDatabase extends DBObject {
 	public void setReadOnly(boolean isReadOnly) {
 		this.isReadOnly = isReadOnly;
 	}
-	public Set<DBObjectTable> getTables() {
+	public List<DBObjectTable> getTables() {
 		return tables;
 	}
 	public void setTables(List<DBObjectTable> tables) {
 		this.tables.addAll(tables);
 	}
-	
+	public void sortTablesByCase() {
+		Collections.sort(this.tables, new DBObjectTable.CaseComparator());
+	}
 }

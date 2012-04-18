@@ -1,10 +1,12 @@
 package dh.protege41.db2onto.event.dbobject;
 
+import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-public class DBObjectTable extends DBObject {
+public class DBObjectTable extends DBObject implements Comparable {
 	public static final String TABLE_CAT = "TABLE_CAT"; //string: show name of database
 	public static final String TABLE_SCHEM = "TABLE_SCHEM";//string dbo
 	public static final String TABLE_NAME = "TABLE_NAME"; //string name of table
@@ -23,11 +25,11 @@ public class DBObjectTable extends DBObject {
 	private String category;
 	private String schem;
 	private String type;
-	private int tableCase;
+	private int tableCase = DBObjectType.CASE_0;
 	
-	private Set<DBObjectColumn> columns = new HashSet<DBObjectColumn>();
-	private Set<DBObjectPrimaryKey> primaryKeys = new HashSet<DBObjectPrimaryKey>();
-	private Set<DBObjectForeignKey> foreignKeys = new HashSet<DBObjectForeignKey>();
+	private List<DBObjectColumn> columns = new ArrayList<DBObjectColumn>();
+	private List<DBObjectPrimaryKey> primaryKeys = new ArrayList<DBObjectPrimaryKey>();
+	private List<DBObjectForeignKey> foreignKeys = new ArrayList<DBObjectForeignKey>();
 	
 	public DBObjectTable() {
 		super(DBObjectType.DB_TABLE_OBJECT, "Unknown");
@@ -49,6 +51,18 @@ public class DBObjectTable extends DBObject {
 		this.columns.addAll(cols);
 		this.primaryKeys.addAll(pks);
 		this.foreignKeys.addAll(fks);
+	}
+	
+	public DBObjectForeignKey getFKByColumnName(String colName) {
+		if(colName == null){
+			return null;
+		}
+		for(DBObjectForeignKey fk : this.foreignKeys) {
+			if(colName.equals(fk.getFKColumn())) {
+				return fk;
+			}
+		}
+		return null;
 	}
 	
 	public DBObjectColumn getColumnByName(String colName) {
@@ -82,9 +96,6 @@ public class DBObjectTable extends DBObject {
 		this.foreignKeys.add(fk);
 	}
 	
-	
-	
-	
 	public String getCategory() {
 		return category;
 	}
@@ -109,23 +120,43 @@ public class DBObjectTable extends DBObject {
 	public void setTableCase(int tableCase) {
 		this.tableCase = tableCase;
 	}
-	public Set<DBObjectColumn> getColumns() {
+	public List<DBObjectColumn> getColumns() {
 		return columns;
 	}
 	public void setColumns(List<DBObjectColumn> columns) {
 		this.columns.addAll(columns);
 	}
-	public Set<DBObjectPrimaryKey> getPrimaryKeys() {
+	public List<DBObjectPrimaryKey> getPrimaryKeys() {
 		return primaryKeys;
 	}
 	public void setPrimaryKeys(List<DBObjectPrimaryKey> primaryKeys) {
 		this.primaryKeys.addAll(primaryKeys);
 	}
-	public Set<DBObjectForeignKey> getForeignKeys() {
+	public List<DBObjectForeignKey> getForeignKeys() {
 		return foreignKeys;
 	}
 	public void setForeignKeys(List<DBObjectForeignKey> foreignKeys) {
 		this.foreignKeys.addAll(foreignKeys);
 	}
 	
+	@Override
+	public int compareTo(Object o) {
+		if(!(o instanceof DBObjectTable)) {
+			throw new ClassCastException();
+		}
+		return DBObjectTable.this.getName().compareTo(((DBObjectTable)o).getName());
+	}
+	
+	static class CaseComparator implements Comparator {
+
+		@Override
+		public int compare(Object o1, Object o2) {
+			if(!(o1 instanceof DBObjectTable) || !(o2 instanceof DBObjectTable)) {
+				throw new ClassCastException();
+			}
+			
+			return -(((DBObjectTable)o1).getTableCase() - ((DBObjectTable)o2).getTableCase());
+		}
+		
+	}
 }

@@ -10,4 +10,6 @@ public interface DBOperationEventType {
 	public static final String DB_OPERATION_CONNECT = "DB_OPERATION_CONNECT";
 	public static final String DB_OPERATION_CONNECTED = "DB_OPERATION_CONNECTED";
 	public static final String DB_OPERATION_DISCONNECT = "DB_OPERATION_DISCONNECT";
+	
+	public static final String DB_OPERATION_MAPPING = "DB_OPERATION_MAPPING";
 }

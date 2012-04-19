@@ -7,10 +7,13 @@ public interface DBOperationEventType {
 	public static final String DB_OPERATION_LOADING = "DB_OPERATION_LOADING";
 	public static final String DB_OPERATION_LOADED = "DB_OPERATION_LOADED";
 	public static final String DB_OPERATION_CANCEL = "DB_OPERATION_CANCEL";
+	
+	
 	public static final String DB_OPERATION_CONNECT = "DB_OPERATION_CONNECT";
 	public static final String DB_OPERATION_CONNECTED = "DB_OPERATION_CONNECTED";
 	public static final String DB_OPERATION_DISCONNECT = "DB_OPERATION_DISCONNECT";
 	public static final String DB_OPERATION_DISCONNECTED = "DB_OPERATION_DISCONNECTED";
 	
 	public static final String DB_OPERATION_MAPPING = "DB_OPERATION_MAPPING";
+	public static final String DB_OPERATION_CREATE_INDIVIDUAL = "DB_OPERATION_CREATE_INDIVIDUAL";
 }

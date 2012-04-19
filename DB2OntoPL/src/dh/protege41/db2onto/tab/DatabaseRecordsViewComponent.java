@@ -10,6 +10,7 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseMotionListener;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Vector;
@@ -156,64 +157,98 @@ public class DatabaseRecordsViewComponent extends DatabaseViewComponent {
 					_handleCreateIndividuals();
 				}
 			});
+			btnQuery.addActionListener(new ActionListener() {
+				
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					// TODO Auto-generated method stub
+					if(tfQuery.getText() != null && !"".equals(tfQuery.getText().trim())) 
+						handleQuery(tfQuery.getText().trim());
+					else 
+						DialogUtility.showMessages("Input your query first.");
+				}
+			});
 		}
 
 		@Override
 		public void handleEvents(String event) {
 			// TODO Auto-generated method stub
 			if(event.equals(DBObjectEventType.DB_OBJECT_SELECTION_CHANGED)) {
-				rebuildTable((DBObjectTable)getLastDisplayedDBObject());
+				if(getLastDisplayedDBObject() instanceof DBObjectTable) {
+					handleSelectTable((DBObjectTable)getLastDisplayedDBObject());
+				}
 //				log.info("records component handle event selection changed");
 			} else if (DBOperationEventType.DB_OPERATION_CONNECTED.equals(event)) {
 				enableConnected();
 			} else if(event.equals(DBOperationEventType.DB_OPERATION_DISCONNECTED)) {
 				enableDisconnected();
 //				log.info("Error: the connection was lost. Try to connect again");
+			} else if(DBOperationEventType.DB_OPERATION_DISCONNECT.equals(event)) {
+				remove(centerPanel);
+				revalidate();
+			} else if(DBOperationEventType.DB_OPERATION_CONNECT.equals(event)) {
+				remove(centerPanel);
+				revalidate();
 			}
 		}
 		
-		public void rebuildTable(DBObjectTable dbObject) {
+		public void handleQuery(String query) {
+			try {
+				getView().setHeaderText("Query");
+				DBOperationImplement opImpl = getDBOperationImpl();
+				if(opImpl != null) {
+					ResultSet rs = opImpl.exeQuery(query);
+					rebuildTable(rs);
+				}
+			} catch (Exception e) {
+				DialogUtility.showConfirmDialog(null, "Bad query", new JLabel("Please check your query string"), JOptionPane.ERROR_MESSAGE, JOptionPane.DEFAULT_OPTION, null, true);
+			}
+		}
+		
+		public void handleSelectTable(DBObjectTable dbTable) {
 			try {
 				DBOperationImplement opImpl = getDBOperationImpl();
 				if(opImpl != null) {
-					ResultSet rs = opImpl.exeQuery("SELECT * FROM " + dbObject.getName());
-					ResultSetMetaData rsmd = rs.getMetaData();
-					int totalCols = rsmd.getColumnCount();
-					List<String> colNames = new ArrayList<String>();
-					
-					//init vector to store data
-					Vector<ArrayList<String>> data = new Vector<ArrayList<String>>();
-					for(int i = 1; i <= totalCols; i ++){
-						//rememeber: in ResultSet columns start 1 position
-						colNames.add(rsmd.getColumnName(i));
-						data.add(new ArrayList<String>());
-					}
-					while(rs.next()) {
-						for(int k = 1; k <= totalCols; k++) {
-							//rememeber: in ResultSet columns start 1 position
-							data.get(k - 1).add(rs.getString(k));
-						}
-					}
-					//update table
-					remove(centerPanel);
-					//first column is exception
-					table = new DBCheckTable<String>(colNames.get(0));
-					tableModel = table.getModel();
-					tableModel.setData(data.get(0), false);
-					for(int r = 1; r < totalCols; r++) {
-						tableModel.addColumn(colNames.get(r), data.get(r).toArray());
-					}
-					_initTableListener();
-					centerPanel = new JScrollPane(table);
-					add(centerPanel, BorderLayout.CENTER);
-					revalidate();
+					ResultSet rs = opImpl.exeQuery("SELECT * FROM " + dbTable.getName());
+					rebuildTable(rs);
 				}
 			} catch (Exception e) {
 				log.error("rebuild table has error");
 			}
 		}
-
 		
+		public void rebuildTable(ResultSet rs) throws SQLException {
+			ResultSetMetaData rsmd = rs.getMetaData();
+			int totalCols = rsmd.getColumnCount();
+			List<String> colNames = new ArrayList<String>();
+			//init vector to store data
+			Vector<ArrayList<String>> data = new Vector<ArrayList<String>>();
+			for(int i = 1; i <= totalCols; i ++){
+				//rememeber: in ResultSet columns start 1 position
+				colNames.add(rsmd.getColumnName(i));
+				data.add(new ArrayList<String>());
+			}
+			while(rs.next()) {
+				for(int k = 1; k <= totalCols; k++) {
+					//rememeber: in ResultSet columns start 1 position
+					data.get(k - 1).add(rs.getString(k));
+				}
+			}
+			//update table
+			remove(centerPanel);
+			//first column is exception
+			table = new DBCheckTable<String>(colNames.get(0));
+			tableModel = table.getModel();
+			tableModel.setData(data.get(0), false);
+			for(int r = 1; r < totalCols; r++) {
+				tableModel.addColumn(colNames.get(r), data.get(r).toArray());
+			}
+			_initTableListener();
+			centerPanel = new JScrollPane(table);
+			add(centerPanel, BorderLayout.CENTER);
+			revalidate();
+		}
+
 		private void _initTableListener() {
 			table.addMouseMotionListener(new MouseMotionListener() {
 				@Override
@@ -225,7 +260,7 @@ public class DatabaseRecordsViewComponent extends DatabaseViewComponent {
 				}
 			});
 		}
-		
+
 		private void _handleMouseMoved() {
 			Point pt = table.getMousePosition();
 			if(pt != null) {
@@ -239,7 +274,7 @@ public class DatabaseRecordsViewComponent extends DatabaseViewComponent {
 				}
 			}
 		}
-		
+
 		private void _handleCreateIndividuals() {
 			if(table == null || table.getSelectedRecords().size() == 0) {
 				DialogUtility.showConfirmDialog(null, DB2OntoPLConstants.MESSAGE_TABLE_NULL_TITLE, new JLabel(DB2OntoPLConstants.MESSAGE_TABLE_NULL_CONTENT), JOptionPane.ERROR_MESSAGE, JOptionPane.DEFAULT_OPTION, null, true);
@@ -251,12 +286,12 @@ public class DatabaseRecordsViewComponent extends DatabaseViewComponent {
 					table.getSelectedRecords());
 			int choice = DialogUtility.showConfirmDialog(null, "Create individuals", panel, JOptionPane.PLAIN_MESSAGE, JOptionPane.OK_CANCEL_OPTION, null, false);
 			if(choice == JOptionPane.OK_OPTION) {
-				panel.handleEvents(DBOperationEventType.DB_OPERATION_CANCEL);
+				panel.handleEvents(DBOperationEventType.DB_OPERATION_CREATE_INDIVIDUAL);
 			} else if(choice == JOptionPane.CANCEL_OPTION) {
 //				log.info("Cancel selected");
 			}
 		}
-		
+
 		private void enableDisconnected() {
 			tfQuery.setEditable(false);
 			btnQuery.setEnabled(false);
@@ -264,7 +299,7 @@ public class DatabaseRecordsViewComponent extends DatabaseViewComponent {
 			lbConnectionStatus.setText(DB2OntoPLConstants.STATUS_DISCONNECTED);
 			this.revalidate();
 		}
-		
+
 		private void enableConnected() {
 			tfQuery.setEditable(true);
 			btnQuery.setEnabled(true);

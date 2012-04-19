@@ -43,7 +43,7 @@ public class DatabaseDescriptionViewComponent extends DatabaseViewComponent {
 		setLayout(new BorderLayout());
 		dbDescriptionComponent = new DatabaseDescriptionPanel();
 		add(dbDescriptionComponent, BorderLayout.CENTER);
-		log.info("database description view component initialized!" + dbDescriptionComponent.toString());
+		log.info("database description view component initialized!");
 	}
 	@Override
 	protected DBObject updateView() {

@@ -79,7 +79,7 @@ public class DBCheckTable<O> extends CheckTable<O> {
 				for(int j = 1; j < totalCols; j++) {
 					row.add((O) getValueAt(i, j));
 				}
-				log.info(row);
+//				log.info(row);
 				list.add(row);
 			}
 		}

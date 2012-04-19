@@ -27,6 +27,7 @@ import dh.protege41.db2onto.event.dbobject.DBObject;
 import dh.protege41.db2onto.event.dboperation.DBOperationEventType;
 import dh.protege41.db2onto.event.dboperation.DBOperationObject;
 import dh.protege41.db2onto.tab.ui.DatabasePanel;
+import dh.protege41.db2onto.tab.ui.util.dialog.DialogUtility;
 import dh.protege41.db2onto.tab.ui.util.form.FormUtility;
 import dh.protege41.db2onto.tab.ui.util.panel.PanelUtil;
 
@@ -184,8 +185,6 @@ public class DatabaseConfigureViewComponent extends DatabaseViewComponent {
 				
 				@Override
 				public void actionPerformed(ActionEvent e) {
-					// TODO Auto-generated method stub
-//					handleEvents(DBOperationEventType.DB_OPERATION_CHANGE);
 					DatabaseConfigureViewComponent.setGlobalDBOperationObject(new DBOperationObject(DBOperationEventType.DB_OPERATION_CHANGE));
 				}
 			});
@@ -194,12 +193,11 @@ public class DatabaseConfigureViewComponent extends DatabaseViewComponent {
 				
 				@Override
 				public void actionPerformed(ActionEvent e) {
-					// TODO Auto-generated method stub
 					if(e.getSource() == btnConnect) {
 						if(btnConnect.getText().contains("Disconnect"))
-							handleEvents(DBOperationEventType.DB_OPERATION_DISCONNECT);
+							DatabaseConfigureViewComponent.setGlobalDBOperationObject(new DBOperationObject(DBOperationEventType.DB_OPERATION_DISCONNECT));
 						else 
-							handleEvents(DBOperationEventType.DB_OPERATION_CONNECT);
+							DatabaseConfigureViewComponent.setGlobalDBOperationObject(new DBOperationObject(DBOperationEventType.DB_OPERATION_CONNECT));
 					}
 					
 				}
@@ -233,10 +231,6 @@ public class DatabaseConfigureViewComponent extends DatabaseViewComponent {
 			} else if(DBOperationEventType.DB_OPERATION_CONNECTED.equals(event)) {
 				enableConnectedComponents();
 			}
-		}
-		
-		public void putMessages(String message) {
-			JOptionPane.showMessageDialog(null, message);
 		}
 		
 		private void handleDisconnect() {
@@ -281,7 +275,7 @@ public class DatabaseConfigureViewComponent extends DatabaseViewComponent {
 				DB2OntoPLWorkspaceTab.setConnectStatus(true);
 				setGlobalDBOperationObject(new DBOperationObject(DBOperationEventType.DB_OPERATION_CONNECTED));
 				log.info("connected");
-				putMessages("Connection has been established!");
+				DialogUtility.showMessages("Connection has been established!");
 			} catch (DHConnectionException e) {
 				DB2OntoPLWorkspaceTab.setConnectStatus(false);
 				log.info("can not connect");

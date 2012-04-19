@@ -8,7 +8,12 @@ import java.util.Arrays;
 
 import javax.swing.JComponent;
 import javax.swing.JDialog;
+import javax.swing.JLabel;
 import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JTextArea;
+
+import dh.protege41.db2onto.tab.ui.util.panel.PanelUtil;
 
 public class DialogUtility {
 	
@@ -62,8 +67,16 @@ public class DialogUtility {
 		dlg.setMaximumSize(new Dimension(800, 600));
 		return dlg;
 	}
-
-
+	
+	public static void showMessages(String message) {
+		JOptionPane.showMessageDialog(null, message);
+	}
+	
+	public static void showError(String error) {
+		JTextArea ta = new JTextArea(error, 20, 30);
+		showConfirmDialog(null, "An error has ocurred", (JComponent) PanelUtil.createScroll(ta), JOptionPane.ERROR_MESSAGE, JOptionPane.DEFAULT_OPTION, null, true);
+	}
+	
 	private static int getReturnValue(JOptionPane optionPane) {
 		Object value = optionPane.getValue();
 		if (value != null && optionPane.getOptions() != null){

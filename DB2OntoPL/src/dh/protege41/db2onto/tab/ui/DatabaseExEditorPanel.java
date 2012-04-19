@@ -5,24 +5,18 @@ import java.awt.FlowLayout;
 import java.awt.GridBagLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.HierarchyEvent;
-import java.awt.event.HierarchyListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
-import java.net.URI;
-import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import javax.swing.BorderFactory;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
-import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
 import javax.swing.JTextField;
 import javax.swing.event.ChangeEvent;
@@ -32,41 +26,27 @@ import org.apache.log4j.Logger;
 import org.protege.editor.owl.OWLEditorKit;
 import org.protege.editor.owl.model.entity.OWLEntityCreationException;
 import org.protege.editor.owl.model.entity.OWLEntityCreationSet;
-import org.protege.editor.owl.model.event.EventType;
-import org.protege.editor.owl.model.event.OWLModelManagerChangeEvent;
-import org.protege.editor.owl.model.event.OWLModelManagerListener;
 import org.protege.editor.owl.model.hierarchy.OWLAnnotationPropertyHierarchyProvider;
 import org.protege.editor.owl.ui.UIHelper;
 import org.protege.editor.owl.ui.selector.OWLAnnotationPropertySelectorPanel;
 import org.protege.editor.owl.ui.selector.OWLClassSelectorPanel;
-import org.semanticweb.owlapi.model.AddAxiom;
-import org.semanticweb.owlapi.model.IRI;
 import org.semanticweb.owlapi.model.OWLAnnotationProperty;
 import org.semanticweb.owlapi.model.OWLAnnotationSubject;
 import org.semanticweb.owlapi.model.OWLAnnotationValue;
-import org.semanticweb.owlapi.model.OWLAnnotationValueVisitor;
-import org.semanticweb.owlapi.model.OWLAnnotationValueVisitorEx;
-import org.semanticweb.owlapi.model.OWLAxiom;
-import org.semanticweb.owlapi.model.OWLClass;
-import org.semanticweb.owlapi.model.OWLClassExpression;
-import org.semanticweb.owlapi.model.OWLDataProperty;
 import org.semanticweb.owlapi.model.OWLDatatype;
-import org.semanticweb.owlapi.model.OWLEntity;
 import org.semanticweb.owlapi.model.OWLException;
-import org.semanticweb.owlapi.model.OWLLiteral;
 import org.semanticweb.owlapi.model.OWLNamedIndividual;
-import org.semanticweb.owlapi.model.OWLObject;
-import org.semanticweb.owlapi.model.OWLObjectProperty;
-import org.semanticweb.owlapi.model.OWLObjectVisitor;
-import org.semanticweb.owlapi.model.OWLObjectVisitorEx;
 import org.semanticweb.owlapi.model.OWLOntologyChange;
 import org.semanticweb.owlapi.model.OWLOntologyChangeListener;
 
 import dh.protege41.db2onto.common.DBColumnSize;
 import dh.protege41.db2onto.common.DBRandomGenerator;
+import dh.protege41.db2onto.event.dboperation.DBOperationEventType;
 import dh.protege41.db2onto.owl.OWLOperation;
 import dh.protege41.db2onto.owl.OWLOperationImpl;
+import dh.protege41.db2onto.tab.ui.util.dialog.DialogUtility;
 import dh.protege41.db2onto.tab.ui.util.form.FormUtility;
+import dh.protege41.db2onto.tab.ui.util.panel.PanelUtil;
 
 public class DatabaseExEditorPanel extends JPanel implements DatabasePanel {
 
@@ -81,7 +61,6 @@ public class DatabaseExEditorPanel extends JPanel implements DatabasePanel {
 	private JPanel mainPanel;
 	
 	private JTextField tfClass;
-	private JTextField tfIndividual;
 	
 	private JCheckBox cbCheckAll;
 	private JLabel lbColumnHeader;
@@ -143,7 +122,6 @@ public class DatabaseExEditorPanel extends JPanel implements DatabasePanel {
 	
 	@Override
 	public void initComponents() {
-		// TODO Auto-generated method stub
 		setLayout(new BorderLayout());
 		setSize(getPreferredSize().width, 400);
 		
@@ -170,7 +148,6 @@ public class DatabaseExEditorPanel extends JPanel implements DatabasePanel {
 		
 		lbLangHeader = new JLabel("Lang");
 		formUtility.setPreferredSize(lbLangHeader, 2 * DBColumnSize.DB_COLUMN_SIZE_2);
-//		tfIndividual = new JTextField(15);
 	}
 
 	@Override
@@ -194,7 +171,7 @@ public class DatabaseExEditorPanel extends JPanel implements DatabasePanel {
 		}
 
 		mainPanel.add(topPanel, BorderLayout.NORTH);
-		mainPanel.add(new JScrollPane(centerPanel), BorderLayout.CENTER);
+		mainPanel.add(PanelUtil.createJPanelBorderLayout(PanelUtil.createScroll(centerPanel), BorderLayout.NORTH), BorderLayout.CENTER);
 		
 		JSplitPane splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT);
 		this.add(splitPane);
@@ -205,35 +182,62 @@ public class DatabaseExEditorPanel extends JPanel implements DatabasePanel {
 	@Override
 	public void initEventListeners() {
 		// TODO Auto-generated method stub
-		
+		cbCheckAll.addActionListener(new ActionListener() {
+			
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				if(cbCheckAll.isSelected()) {
+					for(RowPanel rp : DatabaseExEditorPanel.this.listRowPanel) {
+						rp.select(true);
+					}
+				} else {
+					for(RowPanel rp : DatabaseExEditorPanel.this.listRowPanel) {
+						rp.select(false);
+					}
+				}
+			}
+		});
 	}
 
 	@Override
 	public void handleEvents(String event) {
-		// TODO Auto-generated method stub
-		_handleSaveIndividuals();
+		if(DBOperationEventType.DB_OPERATION_CREATE_INDIVIDUAL.equals(event)) {
+			_handleSaveIndividuals();
+		}
 	}
 
 	private void _handleSaveIndividuals() {
-		
+		String className = tfClass.getText();
+		if(className == null || "".equals(className)) {
+			DialogUtility.showMessages("<html>Class can not be null.<br />You must select a class at class selector panel</html>");
+			return;
+		}
 		try {
 			OWLOperation operation = new OWLOperationImpl(_owlEditorKit);
-			
-			String className = classSelector.getSelectedObject().toStringID().substring(classSelector.getSelectedObject().toStringID().indexOf('#') + 1);
-			log.info("Class name: " + className);
 			for(List<String> row : selectedRecords) {
 				OWLEntityCreationSet<OWLNamedIndividual> indi = operation.createOWLIndividual(className + "_" + DBRandomGenerator.createUUID());
 				operation.addOWLOperation(operation.createOWLOntologyChange(operation.createClassTypeForIndividual(classSelector.getSelectedObject(), indi.getOWLEntity())));
 				for(int j = 0; j < row.size(); j++) {
 					RowPanel rp = listRowPanel.get(j);
-					operation.addOWLOperation(operation.createOWLOntologyChange(operation.createAnnotationForIndividual(operation.getAnnotationSubject(indi.getOWLEntity()), (OWLAnnotationProperty)rp.getSelectedAnnotationProperty(), operation.createAnnotationValue(row.get(j), (OWLDatatype)rp.getSelectedDataType()))));
+					if(rp.isSelected()){
+						OWLAnnotationSubject subject = operation.getAnnotationSubject(indi.getOWLEntity());
+						OWLAnnotationProperty AnnoProperty = (OWLAnnotationProperty)rp.getSelectedAnnotationProperty();
+						OWLAnnotationValue value = null;
+						if(rp.getSelectedLang() != null) {
+							value = operation.createAnnotationValue(row.get(j), (String)rp.getSelectedLang());
+						} else if(rp.getSelectedDataType() != null) {
+							value = operation.createAnnotationValue(row.get(j), (OWLDatatype)rp.getSelectedDataType());
+						} else {
+							value = operation.createAnnotationValue(row.get(j));
+						}
+						operation.addOWLOperation(operation.createOWLOntologyChange(operation.createAnnotationForIndividual(subject, AnnoProperty, value)));
+					}
 				}
 			}
-//			log.info("all changes: " + operation.getOWLOperations());
 			operation.applyOWLOperations();
+			DialogUtility.showMessages("The individuals have been created");
 		} catch (OWLEntityCreationException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			log.error("Could not create individuals");
 		}
 //		try {
 //			
@@ -264,14 +268,8 @@ public class DatabaseExEditorPanel extends JPanel implements DatabasePanel {
 //		log.info(annoPropertySelector.getSelectedObject());
 //		log.info(classSelector.getSelectedObject());
 	}
-	
-//	public static void main(String[] args){
-//		JFrame frame = new JFrame("editor extra");
-//		frame.add(new DatabaseExEditorPanel(""));
-//		frame.setSize(500, 600);
-//		frame.setVisible(true);
-//	}
-	
+
+
 	class RowPanel extends JPanel implements DatabasePanel {
 		
 		/**
@@ -296,7 +294,7 @@ public class DatabaseExEditorPanel extends JPanel implements DatabasePanel {
 		
 		public RowPanel(String column) {
 			super(new GridBagLayout());
-			cbSelect = new JCheckBox();
+			cbSelect = new JCheckBox("", true);
 			lbColumn = new JLabel(column);
 			_loadDefaultComboBoxes();
 			resetPreferredSize();
@@ -318,13 +316,6 @@ public class DatabaseExEditorPanel extends JPanel implements DatabasePanel {
 		
 		@Override
 		public void initComponents() {
-//			// TODO Auto-generated method stub
-//			cbSelect = new JCheckBox("", true);
-//			lbColumn = new JLabel("Column");
-//			cbbAnnotationProperty = new JComboBox(new String[] {"anno 1", "anno 2", "annotation property"});
-//			cbbType = new JComboBox(new String[] {"int", "float", "unsigned integer"});
-//			cbbLang = new JComboBox(new String[] {"vi", "en", "fr"});
-//			resetPreferredSize();
 		}
 		
 		public void resetPreferredSize() {
@@ -337,7 +328,6 @@ public class DatabaseExEditorPanel extends JPanel implements DatabasePanel {
 		
 		@Override
 		public void attachComponents() {
-			// TODO Auto-generated method stub
 			formUtility.addLabel(cbSelect, this);
 			formUtility.addLabel(lbColumn, this);
 			formUtility.addLabel(cbbAnnotationProperty, this);
@@ -347,14 +337,31 @@ public class DatabaseExEditorPanel extends JPanel implements DatabasePanel {
 
 		@Override
 		public void initEventListeners() {
-			// TODO Auto-generated method stub
-			this.cbbType.addActionListener(new ActionListener() {
+			this.cbbType.addItemListener(new ItemListener() {
+				
+				@Override
+				public void itemStateChanged(ItemEvent e) {
+					if(cbbType.getSelectedItem() != null) {
+						cbbLang.setSelectedItem(null);
+					}
+				}
+			});
+			this.cbbLang.addItemListener(new ItemListener() {
+				
+				@Override
+				public void itemStateChanged(ItemEvent e) {
+					if(cbbLang.getSelectedItem() != null) {
+						cbbType.setSelectedItem(null);
+					}
+				}
+			});
+			this.cbSelect.addActionListener(new ActionListener() {
 				
 				@Override
 				public void actionPerformed(ActionEvent e) {
-					// TODO Auto-generated method stub
-					OWLDatatype dt = (OWLDatatype)cbbType.getSelectedItem();
-					log.info("datatype iri: " + dt.getIRI());
+					if(!cbSelect.isSelected()) {
+						DatabaseExEditorPanel.this.cbCheckAll.setSelected(false);
+					}
 				}
 			});
 		}
@@ -391,7 +398,7 @@ public class DatabaseExEditorPanel extends JPanel implements DatabasePanel {
 						// TODO Auto-generated method stub
 						if(e.getStateChange() == ItemEvent.SELECTED) {
 							RowPanel.this.lastAnnoPropSelected = new String(e.getItem().toString());
-							log.info("last anno pro selected :  " + e.getItem());
+//							log.info("last anno pro selected :  " + e.getItem());
 						}
 					}
 				});
@@ -409,6 +416,14 @@ public class DatabaseExEditorPanel extends JPanel implements DatabasePanel {
 				cbbAnnotationProperty.setSelectedItem(lastAnnoPropSelected);
 			
 			this.revalidate();
+		}
+		
+		public void select(boolean check) {
+			cbSelect.setSelected(check);
+		}
+		
+		public boolean isSelected() {
+			return cbSelect.isSelected();
 		}
 		
 		public Object getSelectedLang() {

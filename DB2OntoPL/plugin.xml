@@ -35,17 +35,6 @@
       <category value="@org.protege.ontologycategory"></category>
       <headerColor value="@org.protege.individualcolor"/>
    </extension>
-   
-   <!--Example view component -->
-   <extension
-         id="ExampleViewComponent"
-         name="Example View Component"
-         point="org.protege.editor.core.application.ViewComponent">
-      <label value="Example View Component"></label>
-      <class value="dh.protege41.db2onto.tab.ExampleViewComponent"></class>
-      <category value="@org.protege.ontologycategory"></category>
-      <headerColor value="@org.protege.classcolor"/>
-   </extension>
 
    <!--database detail view component -->
    <extension

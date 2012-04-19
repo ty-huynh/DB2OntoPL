@@ -73,6 +73,14 @@ public class DBObjectDatabase extends DBObject {
 		this.tables.addAll(tables);
 	}
 	
+	public String toString() {
+		if(this.tables.size() > 0) {
+			return getName() + " [" + this.tables.get(0).getCategory() + "]";
+		} else {
+			return getName();
+		}
+	}
+	
 	public DBObjectTable getTableByName(String tabName) {
 		if(tabName == null)
 			return null;

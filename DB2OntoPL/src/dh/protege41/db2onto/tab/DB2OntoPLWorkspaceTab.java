@@ -51,7 +51,7 @@ public class DB2OntoPLWorkspaceTab extends OWLWorkspaceViewsTab{
 				_connected = false;
 				_dbOperation = null;
 				log.info("connection was lost");
-				_dbOperationEventManager.selectOperation(new DBOperationObject(DBOperationEventType.DB_OPERATION_DISCONNECT));
+				_dbOperationEventManager.selectOperation(new DBOperationObject(DBOperationEventType.DB_OPERATION_DISCONNECTED));
 			}
 		}
 	}

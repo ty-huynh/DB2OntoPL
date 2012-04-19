@@ -64,10 +64,21 @@ public class DBObjectColumn extends DBObject {
 		try{
 			this.isNullable = ((Integer.parseInt(nullable)) == 0 ? false : true);
 		}catch(Exception e) {
-			
 		}
 		this.isUnique = isUnique;
 	}
+	
+	public String toString() {
+		String name = getName();
+		if(isPK) {
+			name += " [PK]";
+		} 
+		if(isFK) {
+			name += " [FK]";
+		}
+		return name;
+	}
+	
 	public String getNullableString() {
 		return (isNullable ? "YES" : "NO");
 	}

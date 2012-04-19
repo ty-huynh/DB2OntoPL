@@ -28,9 +28,9 @@ import dh.protege41.db2onto.event.dbobject.DBObjectTable;
 import dh.protege41.db2onto.event.dboperation.DBOperationEventType;
 import dh.protege41.db2onto.event.dboperation.DBOperationObject;
 import dh.protege41.db2onto.tab.ui.DatabasePanel;
-import dh.protege41.db2onto.tab.ui.util.DBTreeNode;
-import dh.protege41.db2onto.tab.ui.util.JTreeComponent;
-import dh.protege41.db2onto.tab.ui.util.JTreeNodeVector;
+import dh.protege41.db2onto.tab.ui.util.tree.DBTreeNode;
+import dh.protege41.db2onto.tab.ui.util.tree.JTreeComponent;
+import dh.protege41.db2onto.tab.ui.util.tree.JTreeNodeVector;
 
 public class DatabaseDetailViewComponent extends DatabaseViewComponent {
 
@@ -129,13 +129,43 @@ public class DatabaseDetailViewComponent extends DatabaseViewComponent {
 				dbOperationImpl = getDBOperationImpl();
 				processDatabaseMetaData();
 				buildDatabaseTree();
+			} else if(DBOperationEventType.DB_OPERATION_CONNECT.equals(event)) {
+				handleConnect();
 			}
+		}
+		
+		private void handleConnect() {
+			DBTreeNode root = new DBTreeNode(new DBObject("Database"));
+			resetTree(root);
+		}
+		
+		private void resetTree(DBTreeNode root) {
+			centerPanel.remove(scroll);
+			if(dbTree != null) {
+				dbTree.removeTreeSelectionListener(treeSelectionListener);
+				dbTree.clear();
+			}
+			dbTree = new JTreeComponent(root);
+			_initTreeSelectionEventHandler();
+			scroll = new JScrollPane(dbTree);
+			centerPanel.add(scroll);
+			centerPanel.revalidate();
+			centerPanel.repaint();
 		}
 		/**
 		 * Process database meta data
 		 */
 		public void processDatabaseMetaData() {
 			try {
+				if(databaseInfos != null) {
+					for(DBObjectTable t : databaseInfos.getTables()) {
+						t.getColumns().clear();
+						t.getForeignKeys().clear();
+						t.getPrimaryKeys().clear();
+					}
+					databaseInfos.getTables().clear();
+				}
+				
 				DatabaseMetaData meta = dbOperationImpl.getDatabaseMetaData();
 				databaseInfos = getDatabaseInfos();
 				databaseInfos.setName(meta.getDatabaseProductName());
@@ -203,17 +233,8 @@ public class DatabaseDetailViewComponent extends DatabaseViewComponent {
 				}
 				root.add(tableNode);
 			}
-			centerPanel.remove(scroll);
-			if(dbTree != null) {
-				dbTree.removeTreeSelectionListener(treeSelectionListener);
-				dbTree.clear();
-			}
-			dbTree = new JTreeComponent(root);
-			_initTreeSelectionEventHandler();
-			scroll = new JScrollPane(dbTree);
-			centerPanel.add(scroll);
-			centerPanel.revalidate();
-			centerPanel.repaint();
+			resetTree(root);
+			
 		}
 		
 		private void _initTreeSelectionEventHandler() {

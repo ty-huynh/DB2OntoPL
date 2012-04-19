@@ -195,7 +195,13 @@ public class DatabaseConfigureViewComponent extends DatabaseViewComponent {
 				@Override
 				public void actionPerformed(ActionEvent e) {
 					// TODO Auto-generated method stub
-					handleEvents(DBOperationEventType.DB_OPERATION_CONNECT);
+					if(e.getSource() == btnConnect) {
+						if(btnConnect.getText().contains("Disconnect"))
+							handleEvents(DBOperationEventType.DB_OPERATION_DISCONNECT);
+						else 
+							handleEvents(DBOperationEventType.DB_OPERATION_CONNECT);
+					}
+					
 				}
 			});
 			
@@ -221,6 +227,8 @@ public class DatabaseConfigureViewComponent extends DatabaseViewComponent {
 				});
 				t.start();
 			} else if(DBOperationEventType.DB_OPERATION_DISCONNECT.equals(event)) {
+				handleDisconnect();
+			} else if(DBOperationEventType.DB_OPERATION_DISCONNECTED.equals(event)) {
 				enableDisconnectedComponents();
 			} else if(DBOperationEventType.DB_OPERATION_CONNECTED.equals(event)) {
 				enableConnectedComponents();
@@ -231,12 +239,26 @@ public class DatabaseConfigureViewComponent extends DatabaseViewComponent {
 			JOptionPane.showMessageDialog(null, message);
 		}
 		
+		private void handleDisconnect() {
+			if(getDBOperationImpl() != null) {
+				try {
+					getDBOperationImpl().close();
+				} catch (SQLException e) {
+					log.info("can not close connection");
+				}
+				setDBOperationImpl(null);
+				DB2OntoPLWorkspaceTab.setConnectStatus(false);
+				setGlobalDBOperationObject(new DBOperationObject(DBOperationEventType.DB_OPERATION_DISCONNECTED));
+			}
+		}
+		
 		//should use connection pooler
 		public void setupConnectionDatabase() {
 			String dbType = (String)cbbDBType.getSelectedItem();
 			String driver = tfDriver.getText().trim();
 			String databaseName = tfDBName.getText().trim();
 			String user = tfUsername.getText().trim();
+			@SuppressWarnings("deprecation")
 			String pass = tfPassword.getText().trim();
 			
 			String url = "";
@@ -259,6 +281,7 @@ public class DatabaseConfigureViewComponent extends DatabaseViewComponent {
 				DB2OntoPLWorkspaceTab.setConnectStatus(true);
 				setGlobalDBOperationObject(new DBOperationObject(DBOperationEventType.DB_OPERATION_CONNECTED));
 				log.info("connected");
+				putMessages("Connection has been established!");
 			} catch (DHConnectionException e) {
 				DB2OntoPLWorkspaceTab.setConnectStatus(false);
 				log.info("can not connect");

@@ -15,6 +15,7 @@ import java.util.List;
 import java.util.Vector;
 
 import javax.swing.JButton;
+import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
@@ -25,6 +26,7 @@ import org.protege.editor.core.ui.util.CheckTableModel;
 import org.protege.editor.core.ui.util.JOptionPaneEx;
 
 import dh.database.api.DBOperationImplement;
+import dh.protege41.db2onto.common.DB2OntoPLConstants;
 import dh.protege41.db2onto.event.dbobject.DBObject;
 import dh.protege41.db2onto.event.dbobject.DBObjectEventType;
 import dh.protege41.db2onto.event.dbobject.DBObjectTable;
@@ -65,7 +67,6 @@ public class DatabaseRecordsViewComponent extends DatabaseViewComponent {
 		DBObject dbObject = getLastDisplayedDBObject();
 		if(dbObject instanceof DBObjectTable) {
 			dbRecordsComponent.handleEvents(DBObjectEventType.DB_OBJECT_SELECTION_CHANGED);
-//			log.info("column object was selected : " + ((DBObjectColumn)dbObject).getName());
 		}
 		return null;
 	}
@@ -98,10 +99,7 @@ public class DatabaseRecordsViewComponent extends DatabaseViewComponent {
 		private CheckTableModel<String> tableModel;
 		
 		private JButton btnCreateIndi;
-		private JButton btn1;
-		private JButton btn2;
-		private JButton btn3;
-		
+		private JLabel lbConnectionStatus;
 		private JButton btnQuery;
 		private JTextField tfQuery;
 		
@@ -121,12 +119,11 @@ public class DatabaseRecordsViewComponent extends DatabaseViewComponent {
 			centerPanel = new JScrollPane(table);
 			
 			btnCreateIndi = new JButton("Create Individuals");
-			btn1 = new JButton("One");
-			btn2 = new JButton("Two");
-			btn3 = new JButton("Thr");
+			lbConnectionStatus = new JLabel(DB2OntoPLConstants.STATUS_DISCONNECTED);
 			
 			btnQuery = new JButton("Query");
-			tfQuery = new JTextField(40);	
+			tfQuery = new JTextField(40);
+			enableDisconnected();
 		}
 
 		@Override
@@ -134,9 +131,7 @@ public class DatabaseRecordsViewComponent extends DatabaseViewComponent {
 			// TODO Auto-generated method stub
 			//add to top left panel
 			topLeftPanel.add(btnCreateIndi);
-			topLeftPanel.add(btn1);
-			topLeftPanel.add(btn2);
-			topLeftPanel.add(btn3);
+			topLeftPanel.add(lbConnectionStatus);
 			
 			//add to top right panel
 			topRightPanel.add(tfQuery);
@@ -168,9 +163,12 @@ public class DatabaseRecordsViewComponent extends DatabaseViewComponent {
 			// TODO Auto-generated method stub
 			if(event.equals(DBObjectEventType.DB_OBJECT_SELECTION_CHANGED)) {
 				rebuildTable((DBObjectTable)getLastDisplayedDBObject());
-				log.info("records component handle event selection changed");
-			} else if(event.equals(DBOperationEventType.DB_OPERATION_DISCONNECT)) {
-				log.info("Error: the connection was lost. Try to connect again");
+//				log.info("records component handle event selection changed");
+			} else if (DBOperationEventType.DB_OPERATION_CONNECTED.equals(event)) {
+				enableConnected();
+			} else if(event.equals(DBOperationEventType.DB_OPERATION_DISCONNECTED)) {
+				enableDisconnected();
+//				log.info("Error: the connection was lost. Try to connect again");
 			}
 		}
 		
@@ -178,7 +176,6 @@ public class DatabaseRecordsViewComponent extends DatabaseViewComponent {
 			try {
 				DBOperationImplement opImpl = getDBOperationImpl();
 				if(opImpl != null) {
-					
 					ResultSet rs = opImpl.exeQuery("SELECT * FROM " + dbObject.getName());
 					ResultSetMetaData rsmd = rs.getMetaData();
 					int totalCols = rsmd.getColumnCount();
@@ -191,14 +188,12 @@ public class DatabaseRecordsViewComponent extends DatabaseViewComponent {
 						colNames.add(rsmd.getColumnName(i));
 						data.add(new ArrayList<String>());
 					}
-//					table = new DBCheckTable<String>(colNames.get(0));
 					while(rs.next()) {
 						for(int k = 1; k <= totalCols; k++) {
 							//rememeber: in ResultSet columns start 1 position
 							data.get(k - 1).add(rs.getString(k));
 						}
 					}
-//					log.info("data size: " + data.size() + " array size: " + data.get(0).size());
 					//update table
 					remove(centerPanel);
 					//first column is exception
@@ -214,7 +209,7 @@ public class DatabaseRecordsViewComponent extends DatabaseViewComponent {
 					revalidate();
 				}
 			} catch (Exception e) {
-				e.printStackTrace();
+				log.error("rebuild table has error");
 			}
 		}
 
@@ -241,13 +236,13 @@ public class DatabaseRecordsViewComponent extends DatabaseViewComponent {
 					table.setLastRow(row);
 					String content = tableModel.getValueAt(row, col).toString();
 					table.setTooltip(table.getColumnName(col), content);
-//					setToolTipText(content);
-					log.info(content);
 				}
 			}
 		}
+		
 		private void _handleCreateIndividuals() {
-			if(table == null) {
+			if(table == null || table.getSelectedRecords().size() == 0) {
+				DialogUtility.showConfirmDialog(null, DB2OntoPLConstants.MESSAGE_TABLE_NULL_TITLE, new JLabel(DB2OntoPLConstants.MESSAGE_TABLE_NULL_CONTENT), JOptionPane.ERROR_MESSAGE, JOptionPane.DEFAULT_OPTION, null, true);
 				return;
 			}
 			DatabaseExEditorPanel panel = new DatabaseExEditorPanel(
@@ -258,10 +253,24 @@ public class DatabaseRecordsViewComponent extends DatabaseViewComponent {
 			if(choice == JOptionPane.OK_OPTION) {
 				panel.handleEvents(DBOperationEventType.DB_OPERATION_CANCEL);
 			} else if(choice == JOptionPane.CANCEL_OPTION) {
-				log.info("Cancel selected");
+//				log.info("Cancel selected");
 			}
-			
 		}
 		
+		private void enableDisconnected() {
+			tfQuery.setEditable(false);
+			btnQuery.setEnabled(false);
+			btnCreateIndi.setEnabled(false);
+			lbConnectionStatus.setText(DB2OntoPLConstants.STATUS_DISCONNECTED);
+			this.revalidate();
+		}
+		
+		private void enableConnected() {
+			tfQuery.setEditable(true);
+			btnQuery.setEnabled(true);
+			btnCreateIndi.setEnabled(true);
+			lbConnectionStatus.setText(DB2OntoPLConstants.STATUS_CONNECTED);
+			this.revalidate();
+		}
 	}
 }

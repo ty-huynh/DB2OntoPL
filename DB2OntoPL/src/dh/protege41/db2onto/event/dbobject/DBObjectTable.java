@@ -53,6 +53,10 @@ public class DBObjectTable extends DBObject implements Comparable {
 		this.foreignKeys.addAll(fks);
 	}
 	
+	public String toString() {
+		return getName() + " (" + tableCase + ")";
+	}
+	
 	public DBObjectForeignKey getFKByColumnName(String colName) {
 		if(colName == null){
 			return null;

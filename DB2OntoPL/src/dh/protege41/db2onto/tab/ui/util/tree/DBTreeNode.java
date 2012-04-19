@@ -1,4 +1,4 @@
-package dh.protege41.db2onto.tab.ui.util;
+package dh.protege41.db2onto.tab.ui.util.tree;
 
 import javax.swing.tree.DefaultMutableTreeNode;
 

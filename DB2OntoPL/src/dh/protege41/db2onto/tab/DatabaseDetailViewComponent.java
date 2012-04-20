@@ -28,6 +28,7 @@ import dh.protege41.db2onto.event.dbobject.DBObjectTable;
 import dh.protege41.db2onto.event.dboperation.DBOperationEventType;
 import dh.protege41.db2onto.event.dboperation.DBOperationObject;
 import dh.protege41.db2onto.tab.ui.DatabasePanel;
+import dh.protege41.db2onto.tab.ui.util.tree.DBTreeCellRenderer;
 import dh.protege41.db2onto.tab.ui.util.tree.DBTreeNode;
 import dh.protege41.db2onto.tab.ui.util.tree.JTreeComponent;
 import dh.protege41.db2onto.tab.ui.util.tree.JTreeNodeVector;
@@ -105,6 +106,7 @@ public class DatabaseDetailViewComponent extends DatabaseViewComponent {
 			
 			DBTreeNode root = new DBTreeNode(new DBObject("Database"));
 			dbTree = new JTreeComponent(root);
+			dbTree.setCellRenderer(new DBTreeCellRenderer());
 			scroll = new JScrollPane(dbTree);
 		}
 		
@@ -146,6 +148,7 @@ public class DatabaseDetailViewComponent extends DatabaseViewComponent {
 				dbTree.clear();
 			}
 			dbTree = new JTreeComponent(root);
+			dbTree.setCellRenderer(new DBTreeCellRenderer());
 			_initTreeSelectionEventHandler();
 			scroll = new JScrollPane(dbTree);
 			centerPanel.add(scroll);

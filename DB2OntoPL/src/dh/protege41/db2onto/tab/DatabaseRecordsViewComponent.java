@@ -1,7 +1,9 @@
 package dh.protege41.db2onto.tab;
 
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.FlowLayout;
+import java.awt.Font;
 import java.awt.GridLayout;
 import java.awt.Point;
 import java.awt.event.ActionEvent;
@@ -35,6 +37,8 @@ import dh.protege41.db2onto.event.dboperation.DBOperationEventType;
 import dh.protege41.db2onto.event.dboperation.DBOperationObject;
 import dh.protege41.db2onto.tab.ui.DatabaseExEditorPanel;
 import dh.protege41.db2onto.tab.ui.DatabasePanel;
+import dh.protege41.db2onto.tab.ui.util.DBIcons;
+import dh.protege41.db2onto.tab.ui.util.FontUtility;
 import dh.protege41.db2onto.tab.ui.util.dialog.DialogUtility;
 import dh.protege41.db2onto.tab.ui.util.table.DBCheckTable;
 
@@ -120,11 +124,18 @@ public class DatabaseRecordsViewComponent extends DatabaseViewComponent {
 			centerPanel = new JScrollPane(table);
 			
 			btnCreateIndi = new JButton("Create Individuals");
+			FontUtility.setSmallLabel(btnCreateIndi, Font.BOLD);
+			btnCreateIndi.setIcon(DBIcons.getIcon(DBIcons.ICON_CREATE_INDI_BUTTON));
 			lbConnectionStatus = new JLabel(DB2OntoPLConstants.STATUS_DISCONNECTED);
+			FontUtility.setMediumLabel(lbConnectionStatus, Font.BOLD);
 			
 			btnQuery = new JButton("Query");
+			FontUtility.setSmallLabel(btnQuery, Font.BOLD);
+			btnQuery.setIcon(DBIcons.getIcon(DBIcons.ICON_QUERY_BUTTON));
 			tfQuery = new JTextField(40);
-			enableDisconnected();
+			if(getDBOperationImpl() != null)
+				enableConnected();
+			else enableDisconnected();
 		}
 
 		@Override
@@ -201,7 +212,7 @@ public class DatabaseRecordsViewComponent extends DatabaseViewComponent {
 					rebuildTable(rs);
 				}
 			} catch (Exception e) {
-				DialogUtility.showConfirmDialog(null, "Bad query", new JLabel("Please check your query string"), JOptionPane.ERROR_MESSAGE, JOptionPane.DEFAULT_OPTION, null, true);
+				DialogUtility.showError("Bad query.Please check your query string");
 			}
 		}
 		
@@ -213,7 +224,7 @@ public class DatabaseRecordsViewComponent extends DatabaseViewComponent {
 					rebuildTable(rs);
 				}
 			} catch (Exception e) {
-				log.error("rebuild table has error");
+				DialogUtility.showError(e.getMessage());
 			}
 		}
 		
@@ -277,7 +288,7 @@ public class DatabaseRecordsViewComponent extends DatabaseViewComponent {
 
 		private void _handleCreateIndividuals() {
 			if(table == null || table.getSelectedRecords().size() == 0) {
-				DialogUtility.showConfirmDialog(null, DB2OntoPLConstants.MESSAGE_TABLE_NULL_TITLE, new JLabel(DB2OntoPLConstants.MESSAGE_TABLE_NULL_CONTENT), JOptionPane.ERROR_MESSAGE, JOptionPane.DEFAULT_OPTION, null, true);
+				DialogUtility.showMessages(DB2OntoPLConstants.MESSAGE_TABLE_NULL_CONTENT);
 				return;
 			}
 			DatabaseExEditorPanel panel = new DatabaseExEditorPanel(
@@ -297,6 +308,7 @@ public class DatabaseRecordsViewComponent extends DatabaseViewComponent {
 			btnQuery.setEnabled(false);
 			btnCreateIndi.setEnabled(false);
 			lbConnectionStatus.setText(DB2OntoPLConstants.STATUS_DISCONNECTED);
+			FontUtility.setColorForLabel(lbConnectionStatus, DB2OntoPLConstants.STATUS_DISCONNECTED_COLOR);
 			this.revalidate();
 		}
 
@@ -305,6 +317,7 @@ public class DatabaseRecordsViewComponent extends DatabaseViewComponent {
 			btnQuery.setEnabled(true);
 			btnCreateIndi.setEnabled(true);
 			lbConnectionStatus.setText(DB2OntoPLConstants.STATUS_CONNECTED);
+			FontUtility.setColorForLabel(lbConnectionStatus, DB2OntoPLConstants.STATUS_CONNECTED_COLOR);
 			this.revalidate();
 		}
 	}

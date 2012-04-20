@@ -2,6 +2,7 @@ package dh.protege41.db2onto.tab;
 
 import java.awt.BorderLayout;
 import java.awt.FlowLayout;
+import java.awt.Font;
 import java.awt.GridBagLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -15,6 +16,7 @@ import javax.swing.ButtonGroup;
 import javax.swing.DefaultListModel;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
+import javax.swing.JComboBox;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JList;
@@ -52,6 +54,8 @@ import dh.protege41.db2onto.event.dboperation.DBOperationObject;
 import dh.protege41.db2onto.owl.OWLOperationImpl;
 import dh.protege41.db2onto.preferences.PreferenceManager;
 import dh.protege41.db2onto.tab.ui.DatabasePanel;
+import dh.protege41.db2onto.tab.ui.util.DBIcons;
+import dh.protege41.db2onto.tab.ui.util.FontUtility;
 import dh.protege41.db2onto.tab.ui.util.dialog.DialogUtility;
 import dh.protege41.db2onto.tab.ui.util.form.FormUtility;
 
@@ -135,6 +139,8 @@ public class DatabaseMappingViewComponent extends DatabaseViewComponent {
 			bottomPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
 			mainPanel = new JPanel(new BorderLayout());
 			btnMapping = new JButton(" Mapping to Ontology ");
+			FontUtility.setSmallLabel(btnMapping, Font.BOLD);
+			btnMapping.setIcon(DBIcons.getIcon(DBIcons.ICON_MAPPING_BUTTON));
 			if(getDBOperationImpl() != null) btnMapping.setEnabled(true);
 			else btnMapping.setEnabled(false);
 		}
@@ -144,7 +150,9 @@ public class DatabaseMappingViewComponent extends DatabaseViewComponent {
 			bottomPanel.add(btnMapping);
 			mainPanel.add(new JScrollPane(mappingConfigPanel), BorderLayout.WEST);
 			JPanel pnClass = new JPanel(new GridBagLayout());
-			formUtil.addLastField(new JLabel("Select super class"), pnClass);
+			JLabel superClass = new JLabel("Select super class");
+			FontUtility.setSmallLabel(superClass, Font.BOLD);
+			formUtil.addLastField(superClass, pnClass);
 			formUtil.addLastField(new JScrollPane(classSelector), pnClass);
 			mainPanel.add(pnClass, BorderLayout.CENTER);
 //			mainPanel.add(new JScrollPane(tableSelector), BorderLayout.CENTER);
@@ -159,7 +167,7 @@ public class DatabaseMappingViewComponent extends DatabaseViewComponent {
 				
 				@Override
 				public void actionPerformed(ActionEvent e) {
-					DatabaseMappingViewComponent.this.setGlobalDBOperationObject(new DBOperationObject(DBOperationEventType.DB_OPERATION_MAPPING));
+					DatabaseMappingViewComponent.setGlobalDBOperationObject(new DBOperationObject(DBOperationEventType.DB_OPERATION_MAPPING));
 				}
 			});
 			
@@ -188,12 +196,18 @@ public class DatabaseMappingViewComponent extends DatabaseViewComponent {
 				}
 				OWLOperationImpl owlFactory = new OWLOperationImpl(getOWLEditorKit());
 				//create ontology
-				if(!inActive) owlFactory.createNewOntology();
+				if(!inActive) {
+					String ontoID = mappingConfigPanel.getOntologyID();
+					String ontoLocation = mappingConfigPanel.getOntologyLocation();
+					if(ontoID == null || "".equals(ontoID.trim()) || ontoLocation == null || "".equals(ontoLocation.trim())) {
+						DialogUtility.showError("Ontology ID and Ontology location could not be empty");
+						return;
+					}
+					owlFactory.createNewOntology(ontoID, ontoLocation);
+				}
 				//create classes
-				log.info("create classes");
 				DatabaseMappingViewComponent.this.databaseInfos.sortTablesByCase();
 				for(DBObjectTable table : DatabaseMappingViewComponent.this.databaseInfos.getTables()) {
-					log.info(table.getName() + " : " + table.getTableCase());
 					if(table.getTableCase() == DBObjectType.CASE_3) {
 						owlFactory.addOWLOperation(owlFactory.createOWLClass(table.getName()).getOntologyChanges().get(0));
 						if(inActive) {
@@ -204,19 +218,8 @@ public class DatabaseMappingViewComponent extends DatabaseViewComponent {
 						handleCreateSubClassAxiom(owlFactory, table);
 					}
 				}
-//				owlFactory.applyOWLOperations();
-//				//create subclass
-//				log.info("create subclass axioms");
-//				for(DBObjectTable table : DatabaseMappingViewComponent.this.databaseInfos.getTables()) {
-//					if(table.getTableCase() == DBObjectType.CASE_2) {
-//						handleCreateSubClassAxiom(owlFactory, table);
-//					} else if(inActive && table.getTableCase() == DBObjectType.CASE_3) {
-//						
-//					}
-//				}
 				owlFactory.applyOWLOperations();
 				//create properties: object properties and data properties
-				log.info("create properties and property axioms");
 				IRI iri = owlFactory.getDataTypeBaseIRI();
 				for(DBObjectTable table : DatabaseMappingViewComponent.this.databaseInfos.getTables()) {
 					if(table.getTableCase() == DBObjectType.CASE_3) {
@@ -254,10 +257,8 @@ public class DatabaseMappingViewComponent extends DatabaseViewComponent {
 				}
 				owlFactory.applyOWLOperations();
 			} catch(Exception e) {
-				e.printStackTrace();
 				DialogUtility.showError(e.getMessage());
 			}
-			log.info("created...");
 			DialogUtility.showMessages("Mapping success");
 		}
 		
@@ -335,12 +336,15 @@ public class DatabaseMappingViewComponent extends DatabaseViewComponent {
 		private static final long serialVersionUID = 8861117542308676959L;
 		private static final String IN_NEW_ONTOLOGY = "In the new ontology";
 		private static final String IN_ACTIVE_ONTOLOGY = "In the active ontology";
+		private static final String INDIVIDUALNAME_CLASSNAME_UUID = "Class name + random ID";
+		private static final String INDIVIDUALNAME_CLASSNAME_PKVALUE = "Class name + primary key value";
 		
 		private JLabel lbMappingConfiguration;
 		private ButtonGroup group;
 		private JRadioButton rbActiveOntology;
 		private JRadioButton rbNewOntology;
 		private JCheckBox cbxIncludeContent;
+		private JComboBox cbbNameOfIndividuals;
 		
 		private JTextField tfOntologyID;
 		private JTextField tfOntologyLocation;
@@ -361,18 +365,23 @@ public class DatabaseMappingViewComponent extends DatabaseViewComponent {
 			this.setLayout(new BorderLayout());
 			configPanel = new JPanel(new GridBagLayout());
 			lbMappingConfiguration = new JLabel("Mapping configuration");
+			FontUtility.setSmallLabel(lbMappingConfiguration, Font.BOLD);
+			
 			group = new ButtonGroup();
 			rbActiveOntology = new JRadioButton(IN_ACTIVE_ONTOLOGY, false);
 			group.add(rbActiveOntology);
 			rbNewOntology = new JRadioButton(IN_NEW_ONTOLOGY, true);
 			group.add(rbNewOntology);
 			cbxIncludeContent = new JCheckBox("Include table content", false);
+			FontUtility.setSmallLabel(cbxIncludeContent, Font.BOLD);
 			
 			String ontoID = PreferenceManager.getPreferences().get(PreferenceManager.DEFAULT_ONTOLOGY_BASE_IRI, OntologyPreferences.getInstance().generateURI().toString());
-			tfOntologyID = new JTextField(ontoID, 30);
+			tfOntologyID = new JTextField(ontoID, 40);
 			String location = PreferenceManager.getPreferences().get(PreferenceManager.DEFAULT_ONTOLOGY_BASE_LOCATION, new File(new File(System.getProperty("user.home")), "ontologies").toString());
-			tfOntologyLocation = new JTextField(location + "\\" + getOntologyLocalName(), 23);
+			tfOntologyLocation = new JTextField(location + "\\" + getOntologyLocalName(), 30);
 			btnBrowse = new JButton("Browse");
+			FontUtility.setSmallLabel(btnBrowse, Font.BOLD);
+			btnBrowse.setIcon(DBIcons.getIcon(DBIcons.ICON_BROWSE_BUTTON));
 		}
 
 		@Override
@@ -380,7 +389,9 @@ public class DatabaseMappingViewComponent extends DatabaseViewComponent {
 			formUtil.addLastField(lbMappingConfiguration, configPanel);
 			formUtil.addLastField(rbActiveOntology, configPanel);
 			formUtil.addLastField(rbNewOntology, configPanel);
+			formUtil.addLastField(new JLabel("Ontology ID"), configPanel);
 			formUtil.addLastField(tfOntologyID, configPanel);
+			formUtil.addLastField(new JLabel("Ontology Location"), configPanel);
 			formUtil.addLabel(tfOntologyLocation, configPanel);
 			formUtil.addLastField(btnBrowse, configPanel);
 			formUtil.addLastField(cbxIncludeContent, configPanel);
@@ -407,8 +418,12 @@ public class DatabaseMappingViewComponent extends DatabaseViewComponent {
 						tfOntologyLocation.setEnabled(false);
 						btnBrowse.setEnabled(false);
 					} else if(e.getSource() == rbNewOntology) {
+						String ontoID = PreferenceManager.getPreferences().get(PreferenceManager.DEFAULT_ONTOLOGY_BASE_IRI, OntologyPreferences.getInstance().generateURI().toString());
+						String location = PreferenceManager.getPreferences().get(PreferenceManager.DEFAULT_ONTOLOGY_BASE_LOCATION, new File(new File(System.getProperty("user.home")), "ontologies").toString());
 						tfOntologyID.setEnabled(true);
+						tfOntologyID.setText(ontoID);
 						tfOntologyLocation.setEnabled(true);
+						tfOntologyLocation.setText(location);
 						btnBrowse.setEnabled(true);
 					}
 				}
@@ -441,6 +456,14 @@ public class DatabaseMappingViewComponent extends DatabaseViewComponent {
 		
 		private String getOntologyLocalName() {
 			return tfOntologyID.getText().substring(tfOntologyID.getText().lastIndexOf('/') + 1);
+		}
+		
+		public String getOntologyID() {
+			return tfOntologyID.getText();
+		}
+		
+		public String getOntologyLocation() {
+			return tfOntologyLocation.getText();
 		}
 	}
 	

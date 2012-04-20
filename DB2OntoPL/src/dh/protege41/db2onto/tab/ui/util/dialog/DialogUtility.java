@@ -73,7 +73,8 @@ public class DialogUtility {
 	}
 	
 	public static void showError(String error) {
-		JTextArea ta = new JTextArea(error, 20, 30);
+		JTextArea ta = new JTextArea(error, 10, 50);
+		ta.setEditable(false);
 		showConfirmDialog(null, "An error has ocurred", (JComponent) PanelUtil.createScroll(ta), JOptionPane.ERROR_MESSAGE, JOptionPane.DEFAULT_OPTION, null, true);
 	}
 	

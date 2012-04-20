@@ -2,6 +2,7 @@ package dh.protege41.db2onto.tab;
 
 import java.awt.BorderLayout;
 import java.awt.FlowLayout;
+import java.awt.Font;
 import java.awt.GridBagLayout;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
@@ -27,6 +28,8 @@ import dh.protege41.db2onto.event.dbobject.DBObject;
 import dh.protege41.db2onto.event.dboperation.DBOperationEventType;
 import dh.protege41.db2onto.event.dboperation.DBOperationObject;
 import dh.protege41.db2onto.tab.ui.DatabasePanel;
+import dh.protege41.db2onto.tab.ui.util.DBIcons;
+import dh.protege41.db2onto.tab.ui.util.FontUtility;
 import dh.protege41.db2onto.tab.ui.util.dialog.DialogUtility;
 import dh.protege41.db2onto.tab.ui.util.form.FormUtility;
 import dh.protege41.db2onto.tab.ui.util.panel.PanelUtil;
@@ -124,6 +127,9 @@ public class DatabaseConfigureViewComponent extends DatabaseViewComponent {
 			
 			btnChange = new JButton("Change");
 			btnConnect = new JButton("Connect");
+			FontUtility.setSmallLabel(btnConnect, Font.BOLD);
+			btnConnect.setIcon(DBIcons.getIcon(DBIcons.ICON_CONNECT_BUTTON));
+			
 			btnCancel = new JButton("Cancel");
 		}
 		
@@ -194,12 +200,12 @@ public class DatabaseConfigureViewComponent extends DatabaseViewComponent {
 				@Override
 				public void actionPerformed(ActionEvent e) {
 					if(e.getSource() == btnConnect) {
-						if(btnConnect.getText().contains("Disconnect"))
+						if(btnConnect.getText().contains("Disconnect")) {
 							DatabaseConfigureViewComponent.setGlobalDBOperationObject(new DBOperationObject(DBOperationEventType.DB_OPERATION_DISCONNECT));
-						else 
+						} else {
 							DatabaseConfigureViewComponent.setGlobalDBOperationObject(new DBOperationObject(DBOperationEventType.DB_OPERATION_CONNECT));
+						}
 					}
-					
 				}
 			});
 			
@@ -238,7 +244,7 @@ public class DatabaseConfigureViewComponent extends DatabaseViewComponent {
 				try {
 					getDBOperationImpl().close();
 				} catch (SQLException e) {
-					log.info("can not close connection");
+					DialogUtility.showError("Close connection has error: " + e.getMessage());
 				}
 				setDBOperationImpl(null);
 				DB2OntoPLWorkspaceTab.setConnectStatus(false);
@@ -265,7 +271,7 @@ public class DatabaseConfigureViewComponent extends DatabaseViewComponent {
 				try {
 					getDBOperationImpl().close();
 				} catch (SQLException e) {
-					log.info("can not close connection");
+					DialogUtility.showError("Close connection has error: " + e.getMessage());
 				}
 				setDBOperationImpl(null);
 			}
@@ -274,11 +280,10 @@ public class DatabaseConfigureViewComponent extends DatabaseViewComponent {
 				getDBOperationImpl().createConnection();
 				DB2OntoPLWorkspaceTab.setConnectStatus(true);
 				setGlobalDBOperationObject(new DBOperationObject(DBOperationEventType.DB_OPERATION_CONNECTED));
-				log.info("connected");
 				DialogUtility.showMessages("Connection has been established!");
 			} catch (DHConnectionException e) {
 				DB2OntoPLWorkspaceTab.setConnectStatus(false);
-				log.info("can not connect");
+				DialogUtility.showError("Connecting error");
 			}
 		}
 
@@ -295,6 +300,7 @@ public class DatabaseConfigureViewComponent extends DatabaseViewComponent {
 		}
 		
 		public void enableConnectedComponents() {
+			btnConnect.setIcon(DBIcons.getIcon(DBIcons.ICON_DISCONNECT_BUTTON));
 			btnChange.setEnabled(true);
 			btnConnect.setText("Disconnect");
 			cbbDBType.setEnabled(false);
@@ -308,6 +314,7 @@ public class DatabaseConfigureViewComponent extends DatabaseViewComponent {
 		}
 		
 		public void enableDisconnectedComponents() {
+			btnConnect.setIcon(DBIcons.getIcon(DBIcons.ICON_CONNECT_BUTTON));
 			btnChange.setEnabled(false);
 			btnConnect.setText("Connect");
 			cbbDBType.setEnabled(true);

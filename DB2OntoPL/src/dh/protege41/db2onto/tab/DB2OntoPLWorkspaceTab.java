@@ -12,6 +12,7 @@ import dh.protege41.db2onto.event.dbobject.DBObjectEventManager;
 import dh.protege41.db2onto.event.dboperation.DBOperationEventManager;
 import dh.protege41.db2onto.event.dboperation.DBOperationEventType;
 import dh.protege41.db2onto.event.dboperation.DBOperationObject;
+import dh.protege41.db2onto.tab.ui.util.dialog.DialogUtility;
 
 public class DB2OntoPLWorkspaceTab extends OWLWorkspaceViewsTab{
 
@@ -46,11 +47,10 @@ public class DB2OntoPLWorkspaceTab extends OWLWorkspaceViewsTab{
 		if(_connected) {
 			try {
 				_dbOperation.createConnection();
-				log.info("connection is ok");
 			} catch (DHConnectionException e) {
 				_connected = false;
 				_dbOperation = null;
-				log.info("connection was lost");
+				DialogUtility.showError("Connection was lost");
 				_dbOperationEventManager.selectOperation(new DBOperationObject(DBOperationEventType.DB_OPERATION_DISCONNECTED));
 			}
 		}

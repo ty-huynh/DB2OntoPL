@@ -56,6 +56,8 @@ import org.semanticweb.owlapi.model.OWLOntologyID;
 import org.semanticweb.owlapi.model.OWLSubClassOfAxiom;
 import org.semanticweb.owlapi.vocab.OWL2Datatype;
 
+import dh.protege41.db2onto.tab.ui.util.dialog.DialogUtility;
+
 public class OWLOperationImpl implements OWLOperation {
 	
 	private static final Logger log = Logger.getLogger(OWLOperationImpl.class);
@@ -190,9 +192,7 @@ public class OWLOperationImpl implements OWLOperation {
 			if(o instanceof OWLDatatype) {
 				if(((OWLDatatype)o).isInteger()) {
 					OWLDatatype dt = ((OWLDatatype)o);
-					log.info("iri: " + dt.getIRI());
 					String iri = dt.getIRI().toString().substring(0, dt.getIRI().toString().indexOf('#'));
-					log.info("" + iri);
 					return IRI.create(iri);
 				}
 			}
@@ -229,10 +229,15 @@ public class OWLOperationImpl implements OWLOperation {
 		try {
 			return _owlModelManager.createNewOntology(ontoID, location);
 		} catch (OWLOntologyCreationException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			DialogUtility.showError(e.getMessage());
 		}
 		return null;
+	}
+	
+	public OWLOntology createNewOntology(String ontoID, String location) throws OWLOntologyCreationException {
+		OWLOntologyID owlOntologyID = new OWLOntologyID(IRI.create(ontoID));
+		File file = new File(location);
+		return _owlModelManager.createNewOntology(owlOntologyID, file.toURI());
 	}
 	/**
 	 * create new ontology
@@ -244,16 +249,11 @@ public class OWLOperationImpl implements OWLOperation {
 			String ontoName = "Ontology_creation.owl";
 			OWLOntologyID ontoID = new OWLOntologyID(IRI.create(new URI("http://www.semanticweb.org/ontologies/2012/3/17/" + ontoName)));
 			File file = new File("E:\\ty\\ontologies\\" + ontoName);
-			log.info(file);
-			log.info("ontology iri: " + ontoID);
-			log.info("ontology location: " + file.toURI());
 			return _owlModelManager.createNewOntology(ontoID, file.toURI());
 		} catch (OWLOntologyCreationException e) {
-			log.info("create ontology exception");
-			e.printStackTrace();
+			DialogUtility.showError(e.getMessage());
 		} catch (URISyntaxException e1) {
-			log.info("URI error");
-			e1.printStackTrace();
+			DialogUtility.showError(e1.getMessage());
 		}
 		return null;
 	}

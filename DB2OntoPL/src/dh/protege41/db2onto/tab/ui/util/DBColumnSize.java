@@ -1,4 +1,4 @@
-package dh.protege41.db2onto.common;
+package dh.protege41.db2onto.tab.ui.util;
 
 public interface DBColumnSize {
 	public static final int DB_COLUMN_SIZE_0 = 5;

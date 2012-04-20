@@ -40,18 +40,4 @@ public class JTreeComponent extends JTree {
 	public void clear() {
 		removeAll();
 	}
-	
 }
-
-
-
-
-
-
-
-
-
-
-
-
-

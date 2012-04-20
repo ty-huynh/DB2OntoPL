@@ -15,7 +15,6 @@ public class DBOperationEventManager {
 	public synchronized void selectOperation(DBOperationObject dbOperation) {
 		_dbOperation = dbOperation;
 		_fireOperationEvent();
-		log.info("operation selected");
 	}
 	
 	public synchronized void addDBOperationListener(DBOperationEventListener listener) {

@@ -2,6 +2,7 @@ package dh.protege41.db2onto.tab.ui;
 
 import java.awt.BorderLayout;
 import java.awt.FlowLayout;
+import java.awt.Font;
 import java.awt.GridBagLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -39,11 +40,12 @@ import org.semanticweb.owlapi.model.OWLNamedIndividual;
 import org.semanticweb.owlapi.model.OWLOntologyChange;
 import org.semanticweb.owlapi.model.OWLOntologyChangeListener;
 
-import dh.protege41.db2onto.common.DBColumnSize;
 import dh.protege41.db2onto.common.DBRandomGenerator;
 import dh.protege41.db2onto.event.dboperation.DBOperationEventType;
 import dh.protege41.db2onto.owl.OWLOperation;
 import dh.protege41.db2onto.owl.OWLOperationImpl;
+import dh.protege41.db2onto.tab.ui.util.DBColumnSize;
+import dh.protege41.db2onto.tab.ui.util.FontUtility;
 import dh.protege41.db2onto.tab.ui.util.dialog.DialogUtility;
 import dh.protege41.db2onto.tab.ui.util.form.FormUtility;
 import dh.protege41.db2onto.tab.ui.util.panel.PanelUtil;
@@ -131,22 +133,27 @@ public class DatabaseExEditorPanel extends JPanel implements DatabasePanel {
 		centerPanel = new JPanel(new GridBagLayout());
 		mainPanel = new JPanel(new BorderLayout());
 		
-		tfClass = new JTextField(15);
+		tfClass = new JTextField(30);
+		FontUtility.setSmallLabel(tfClass, Font.BOLD);
 		tfClass.setEditable(false);
 		
 		cbCheckAll = new JCheckBox("", true);
 		formUtility.setPreferredSize(cbCheckAll, DBColumnSize.DB_COLUMN_SIZE_2);
 		
 		lbColumnHeader = new JLabel("Columns");
+		FontUtility.setSmallLabel(lbColumnHeader, Font.BOLD);
 		formUtility.setPreferredSize(lbColumnHeader, DBColumnSize.DB_COLUMN_SIZE_4);
 		
 		lbAnnoHeader = new JLabel("Annotation Property");
+		FontUtility.setSmallLabel(lbAnnoHeader, Font.BOLD);
 		formUtility.setPreferredSize(lbAnnoHeader, DBColumnSize.DB_COLUMN_SIZE_5);
 		
 		lbTypeHeader = new JLabel("Type");
+		FontUtility.setSmallLabel(lbTypeHeader, Font.BOLD);
 		formUtility.setPreferredSize(lbTypeHeader, DBColumnSize.DB_COLUMN_SIZE_3 + DBColumnSize.DB_COLUMN_SIZE_4);
 		
 		lbLangHeader = new JLabel("Lang");
+		FontUtility.setSmallLabel(lbLangHeader, Font.BOLD);
 		formUtility.setPreferredSize(lbLangHeader, 2 * DBColumnSize.DB_COLUMN_SIZE_2);
 	}
 
@@ -222,13 +229,11 @@ public class DatabaseExEditorPanel extends JPanel implements DatabasePanel {
 					if(rp.isSelected()){
 						OWLAnnotationSubject subject = operation.getAnnotationSubject(indi.getOWLEntity());
 						OWLAnnotationProperty AnnoProperty = (OWLAnnotationProperty)rp.getSelectedAnnotationProperty();
-						OWLAnnotationValue value = null;
+						OWLAnnotationValue value = operation.createAnnotationValue(row.get(j));
 						if(rp.getSelectedLang() != null) {
 							value = operation.createAnnotationValue(row.get(j), (String)rp.getSelectedLang());
 						} else if(rp.getSelectedDataType() != null) {
 							value = operation.createAnnotationValue(row.get(j), (OWLDatatype)rp.getSelectedDataType());
-						} else {
-							value = operation.createAnnotationValue(row.get(j));
 						}
 						operation.addOWLOperation(operation.createOWLOntologyChange(operation.createAnnotationForIndividual(subject, AnnoProperty, value)));
 					}
@@ -237,7 +242,7 @@ public class DatabaseExEditorPanel extends JPanel implements DatabasePanel {
 			operation.applyOWLOperations();
 			DialogUtility.showMessages("The individuals have been created");
 		} catch (OWLEntityCreationException e) {
-			log.error("Could not create individuals");
+			DialogUtility.showError(e.getMessage());
 		}
 //		try {
 //			

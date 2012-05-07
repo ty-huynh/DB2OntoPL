@@ -131,14 +131,22 @@ public class DatabaseDetailViewComponent extends DatabaseViewComponent {
 				dbOperationImpl = getDBOperationImpl();
 				processDatabaseMetaData();
 				buildDatabaseTree();
-			} else if(DBOperationEventType.DB_OPERATION_CONNECT.equals(event)) {
+			} else if (DBOperationEventType.DB_OPERATION_CONNECT.equals(event)) {
 				handleConnect();
+			} else if (DBOperationEventType.DB_OPERATION_DISCONNECTED.equals(event)) {
+				clearTree();
+				//fire selection change to clear database, table, column description
+				DatabaseViewComponent.setGlobalSelectionObject(null);
 			}
 		}
 		
 		private void handleConnect() {
 			DBTreeNode root = new DBTreeNode(new DBObject("Database"));
 			resetTree(root);
+		}
+		
+		private void clearTree() {
+			resetTree(null);
 		}
 		
 		private void resetTree(DBTreeNode root) {
@@ -237,7 +245,6 @@ public class DatabaseDetailViewComponent extends DatabaseViewComponent {
 				root.add(tableNode);
 			}
 			resetTree(root);
-			
 		}
 		
 		private void _initTreeSelectionEventHandler() {

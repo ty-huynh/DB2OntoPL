@@ -63,7 +63,7 @@ public abstract class DatabaseViewComponent extends AbstractOWLViewComponent{
 	}
 
 	protected void updateContentAndHeader(DBObject dbObject) {
-		if(!dbObject.equals(_lastDisplayedDBObject) && dbObject != null){
+		if(dbObject != null && !dbObject.equals(_lastDisplayedDBObject)){
 			_lastDisplayedDBObject = dbObject;
 			updateView();
 			updateHeader();

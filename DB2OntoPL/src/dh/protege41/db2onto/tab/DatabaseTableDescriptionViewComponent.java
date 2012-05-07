@@ -16,6 +16,7 @@ import dh.protege41.db2onto.event.dbobject.DBObjectColumn;
 import dh.protege41.db2onto.event.dbobject.DBObjectDatabase;
 import dh.protege41.db2onto.event.dbobject.DBObjectEventType;
 import dh.protege41.db2onto.event.dbobject.DBObjectTable;
+import dh.protege41.db2onto.event.dboperation.DBOperationEventType;
 import dh.protege41.db2onto.event.dboperation.DBOperationObject;
 import dh.protege41.db2onto.tab.DatabaseDescriptionViewComponent.DatabaseDescriptionPanel;
 import dh.protege41.db2onto.tab.ui.DatabasePanel;
@@ -66,7 +67,7 @@ public class DatabaseTableDescriptionViewComponent extends DatabaseViewComponent
 	}
 	@Override
 	protected DBOperationObject performOperation() {
-		// TODO Auto-generated method stub
+		dbTableDescriptionComponent.handleEvents(getLastPerformedDBOperation().getOperation());
 		return null;
 	}
 	
@@ -85,6 +86,8 @@ public class DatabaseTableDescriptionViewComponent extends DatabaseViewComponent
 		public void handleEvents(String event) {
 			if(event.equals(DBObjectEventType.DB_OBJECT_SELECTION_CHANGED)) {
 				resetDBListModel(DatabaseTableDescriptionViewComponent.this.getLastDisplayedDBObject());
+			} else if (DBOperationEventType.DB_OPERATION_DISCONNECTED.equals(event)) {
+				resetDBListModel(null);
 			}
 		}
 

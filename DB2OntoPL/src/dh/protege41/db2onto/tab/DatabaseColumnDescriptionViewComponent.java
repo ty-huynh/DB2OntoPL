@@ -16,6 +16,7 @@ import dh.protege41.db2onto.event.dbobject.DBObjectColumn;
 import dh.protege41.db2onto.event.dbobject.DBObjectDatabase;
 import dh.protege41.db2onto.event.dbobject.DBObjectEventType;
 import dh.protege41.db2onto.event.dbobject.DBObjectTable;
+import dh.protege41.db2onto.event.dboperation.DBOperationEventType;
 import dh.protege41.db2onto.event.dboperation.DBOperationObject;
 import dh.protege41.db2onto.tab.ui.DatabasePanel;
 import dh.protege41.db2onto.tab.ui.DescriptionPanel;
@@ -50,7 +51,7 @@ public class DatabaseColumnDescriptionViewComponent extends DatabaseViewComponen
 	@Override
 	protected DBObject updateView() {
 		DBObject dbObject = getLastDisplayedDBObject();
-		if(dbObject instanceof DBObjectColumn) {
+		if(dbObject != null && dbObject instanceof DBObjectColumn) {
 			dbColumnDescriptionComponent.handleEvents(DBObjectEventType.DB_OBJECT_SELECTION_CHANGED);
 		}
 		return null;
@@ -64,7 +65,7 @@ public class DatabaseColumnDescriptionViewComponent extends DatabaseViewComponen
 	}
 	@Override
 	protected DBOperationObject performOperation() {
-		// TODO Auto-generated method stub
+		dbColumnDescriptionComponent.handleEvents(getLastPerformedDBOperation().getOperation());
 		return null;
 	}
 
@@ -83,6 +84,8 @@ public class DatabaseColumnDescriptionViewComponent extends DatabaseViewComponen
 		public void handleEvents(String event) {
 			if(event.equals(DBObjectEventType.DB_OBJECT_SELECTION_CHANGED)) {
 				resetDBListModel(DatabaseColumnDescriptionViewComponent.this.getLastDisplayedDBObject());
+			} else if (DBOperationEventType.DB_OPERATION_DISCONNECTED.equals(event)) {
+				resetDBListModel(null);
 			}
 		}
 

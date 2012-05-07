@@ -41,7 +41,7 @@ public class DBOperationImplement implements DBOperation {
 		try {
 			this.conn = dbConnection.connect();
 		} catch (Exception e) {
-			throw new DHConnectionException("connection failure");
+			throw new DHConnectionException(e.getMessage() + "\nMaybe the other reasons were: \n\t Your database server has not been start yet \n\t SQL Server different with SQL Server express");
 		}
 		return conn;
 	}

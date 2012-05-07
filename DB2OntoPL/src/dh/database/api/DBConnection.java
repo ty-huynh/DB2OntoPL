@@ -46,10 +46,10 @@ public class DBConnection {
 			conn = DriverManager.getConnection(url, username, password);
 		} catch (ClassNotFoundException e) {
 			log.info("Driver error");
-			throw new DHConnectionException("connection failure");
+			throw new DHConnectionException(e.getMessage());
 		} catch (SQLException e) {
 			log.info("Connection error");
-			throw new DHConnectionException("connection failure");
+			throw new DHConnectionException(e.getMessage());
 		}
 		return conn;
 	}

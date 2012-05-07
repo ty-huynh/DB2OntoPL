@@ -165,9 +165,9 @@ public class DatabaseConfigureViewComponent extends DatabaseViewComponent {
 //			panelCenter.add(tfPassword);
 			
 			//attach components to bottom panel
-			panelBottom.add(btnChange);
+//			panelBottom.add(btnChange);
 			panelBottom.add(btnConnect);
-//			panelBottom.add(btnCancel);
+			panelBottom.add(btnCancel);
 			//attach components to main panel
 			add(PanelUtil.createScroll(PanelUtil.createJPanelBorderLayout(panelCenter, BorderLayout.NORTH)), BorderLayout.CENTER);
 			add(panelBottom, BorderLayout.SOUTH);
@@ -283,7 +283,8 @@ public class DatabaseConfigureViewComponent extends DatabaseViewComponent {
 				DialogUtility.showMessages("Connection has been established!");
 			} catch (DHConnectionException e) {
 				DB2OntoPLWorkspaceTab.setConnectStatus(false);
-				DialogUtility.showError("Connecting error");
+				DialogUtility.showError("Connection failure: " + e.getMessage());
+				setGlobalDBOperationObject(new DBOperationObject(DBOperationEventType.DB_OPERATION_DISCONNECTED));
 			}
 		}
 

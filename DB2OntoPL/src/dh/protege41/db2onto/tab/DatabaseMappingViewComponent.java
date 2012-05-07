@@ -189,7 +189,7 @@ public class DatabaseMappingViewComponent extends DatabaseViewComponent {
 				boolean inActive = false;
 				if(MappingConfigurationPanel.IN_ACTIVE_ONTOLOGY.equals(mappingConfigPanel.getSelectedChoice())) {
 					if(classSelector.getSelectedObject() == null) {
-						DialogUtility.showMessages("<html>If you want to import to active ontology,<br />You must specify a super class</html>");
+						DialogUtility.showMessages("<html>If you want to import to active ontology,<br />You must specify a <b>super class</b><br />Select a super class in class hierachy in mapping tab</html>");
 						return;
 					}
 					inActive = true;
@@ -256,10 +256,10 @@ public class DatabaseMappingViewComponent extends DatabaseViewComponent {
 					}
 				}
 				owlFactory.applyOWLOperations();
+				DialogUtility.showMessages("Mapping success");
 			} catch(Exception e) {
 				DialogUtility.showError(e.getMessage());
 			}
-			DialogUtility.showMessages("Mapping success");
 		}
 		
 		public void handleCreateSubClassAxiom(OWLOperationImpl owlFactory, DBObjectTable table, OWLClass superClass) throws URISyntaxException {

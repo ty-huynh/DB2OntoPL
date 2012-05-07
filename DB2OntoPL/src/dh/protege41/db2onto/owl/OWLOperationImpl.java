@@ -217,6 +217,11 @@ public class OWLOperationImpl implements OWLOperation {
 	}
 	
 	@Override
+	public void clearOWLOperations() {
+		this.operations.clear();
+	}
+	
+	@Override
 	public void addOWLOperation(OWLOntologyChange change) {
 		operations.add(change);
 	}
@@ -278,8 +283,7 @@ public class OWLOperationImpl implements OWLOperation {
 	}
 	
 	public OWLClass getOWLClass(String className) throws URISyntaxException {
-		IRI clsIRI = IRI.create(new URI(getBaseIRI() + "#" + className));
-		return _owlDataFactory.getOWLClass(clsIRI);
+		return _owlDataFactory.getOWLClass(getEntityIRI(className));
 	}
 	
 	public OWLSubClassOfAxiom getSubClassAxiom(OWLClass sub, OWLClass sup) {
@@ -290,7 +294,17 @@ public class OWLOperationImpl implements OWLOperation {
 		return this.getSubClassAxiom(getOWLClass(subClass), getOWLClass(supClass));
 	}
 	
+	public IRI getEntityIRI(String entityName) throws URISyntaxException {
+		return IRI.create(new URI(getBaseIRI() + "#" + entityName));
+	}
 	/* PROPERTIES */
+	public OWLObjectProperty getOWLObjectProperty(String propName) throws URISyntaxException {
+		return _owlDataFactory.getOWLObjectProperty(getEntityIRI(propName));
+	}
+	public OWLDataProperty getOWLDataProperty(String propName) throws URISyntaxException {
+		return _owlDataFactory.getOWLDataProperty(getEntityIRI(propName));
+	}
+	
 	public OWLEntityCreationSet<OWLObjectProperty> createOWLObjectProperty(String propName, IRI baseIRI) throws OWLEntityCreationException {
 		if(baseIRI == null) {
 			baseIRI = getBaseIRI();

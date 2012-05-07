@@ -71,11 +71,16 @@ public class DialogUtility {
 	public static void showMessages(String message) {
 		JOptionPane.showMessageDialog(null, message);
 	}
+	public static void showInfos(String message, String title) {
+		JTextArea ta = new JTextArea(message, 10, 50);
+		ta.setEditable(false);
+		showConfirmDialog(null, title, (JComponent) PanelUtil.createScroll(ta), JOptionPane.INFORMATION_MESSAGE, JOptionPane.DEFAULT_OPTION, null, true);
+	}
 	
 	public static void showError(String error) {
 		JTextArea ta = new JTextArea(error, 10, 50);
 		ta.setEditable(false);
-		showConfirmDialog(null, "An error has ocurred", (JComponent) PanelUtil.createScroll(ta), JOptionPane.ERROR_MESSAGE, JOptionPane.DEFAULT_OPTION, null, true);
+		showConfirmDialog(null, "Errors has ocurred", (JComponent) PanelUtil.createScroll(ta), JOptionPane.ERROR_MESSAGE, JOptionPane.DEFAULT_OPTION, null, true);
 	}
 	
 	private static int getReturnValue(JOptionPane optionPane) {

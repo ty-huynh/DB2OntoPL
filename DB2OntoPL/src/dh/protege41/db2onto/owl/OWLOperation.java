@@ -69,7 +69,7 @@ public abstract interface OWLOperation {
 	public abstract OWLOntologyChange createOWLAxiom(OWLAxiom axiom);
 
 	public abstract void applyOWLOperations();
-
+	public void clearOWLOperations();
 	public abstract void addOWLOperation(OWLOntologyChange change);
 	public List<OWLOntologyChange> getOWLOperations();
 }

@@ -36,12 +36,16 @@ import org.semanticweb.owlapi.model.IRI;
 import org.semanticweb.owlapi.model.OWLAxiom;
 import org.semanticweb.owlapi.model.OWLClass;
 import org.semanticweb.owlapi.model.OWLDataProperty;
+import org.semanticweb.owlapi.model.OWLDataPropertyDomainAxiom;
+import org.semanticweb.owlapi.model.OWLDataPropertyRangeAxiom;
 import org.semanticweb.owlapi.model.OWLDataRange;
 import org.semanticweb.owlapi.model.OWLEntity;
 import org.semanticweb.owlapi.model.OWLObjectProperty;
 import org.semanticweb.owlapi.model.OWLOntologyChange;
+import org.semanticweb.owlapi.model.OWLOntologyCreationException;
 
 import dh.protege41.db2onto.common.DBDataType;
+import dh.protege41.db2onto.common.MessagesUtility;
 import dh.protege41.db2onto.event.dbobject.DBObject;
 import dh.protege41.db2onto.event.dbobject.DBObjectColumn;
 import dh.protege41.db2onto.event.dbobject.DBObjectDatabase;
@@ -69,6 +73,7 @@ public class DatabaseMappingViewComponent extends DatabaseViewComponent {
 	private static final Logger log = Logger.getLogger(DatabaseMappingViewComponent.class);
 	private DBObjectDatabase databaseInfos;
 	private DatabaseMappingPanel mappingComponent;
+	
 	@Override
 	protected void disposeOWLView() {
 		// TODO Auto-generated method stub
@@ -123,6 +128,8 @@ public class DatabaseMappingViewComponent extends DatabaseViewComponent {
 		private OWLEditorKit owlEditorKit;
 		
 		private FormUtility formUtil = new FormUtility();
+		private MessagesUtility messagesUtil = new MessagesUtility();
+		
 		public DatabaseMappingPanel(OWLEditorKit ekit) {
 			this.owlEditorKit = ekit;
 			initComponents();
@@ -183,9 +190,10 @@ public class DatabaseMappingViewComponent extends DatabaseViewComponent {
 				btnMapping.setEnabled(false);
 			}
 		}
-
+		
 		private void _handleMapping() {
-			try{
+			try {
+				this.messagesUtil.clearAll();
 				boolean inActive = false;
 				if(MappingConfigurationPanel.IN_ACTIVE_ONTOLOGY.equals(mappingConfigPanel.getSelectedChoice())) {
 					if(classSelector.getSelectedObject() == null) {
@@ -203,101 +211,184 @@ public class DatabaseMappingViewComponent extends DatabaseViewComponent {
 						DialogUtility.showError("Ontology ID and Ontology location could not be empty");
 						return;
 					}
-					owlFactory.createNewOntology(ontoID, ontoLocation);
+					try {
+						owlFactory.createNewOntology(ontoID, ontoLocation);
+						this.messagesUtil.addInfo("OWLOntology creation", "done");
+					} catch (OWLOntologyCreationException e) {
+						DialogUtility.showError("Ontology creation failure");
+						return;
+					}
 				}
 				//create classes
-				DatabaseMappingViewComponent.this.databaseInfos.sortTablesByCase();
-				for(DBObjectTable table : DatabaseMappingViewComponent.this.databaseInfos.getTables()) {
-					if(table.getTableCase() == DBObjectType.CASE_3) {
-						owlFactory.addOWLOperation(owlFactory.createOWLClass(table.getName()).getOntologyChanges().get(0));
-						if(inActive) {
-							handleCreateSubClassAxiom(owlFactory, table, classSelector.getSelectedObject());
-						}
-					} else if(table.getTableCase() == DBObjectType.CASE_2) {
-						owlFactory.addOWLOperation(owlFactory.createOWLClass(table.getName()).getOntologyChanges().get(0));
-						handleCreateSubClassAxiom(owlFactory, table);
-					}
-				}
+				mappingClass(owlFactory, inActive);
+				
 				owlFactory.applyOWLOperations();
 				//create properties: object properties and data properties
-				IRI iri = owlFactory.getDataTypeBaseIRI();
-				for(DBObjectTable table : DatabaseMappingViewComponent.this.databaseInfos.getTables()) {
+				mappingProperties(owlFactory);
+				
+				owlFactory.applyOWLOperations();
+			} catch(Exception e) {
+				this.messagesUtil.addError("Other error", e.getMessage());
+			}
+			if(this.messagesUtil.hasErrors()) {
+				DialogUtility.showInfos("Mapping done but have some errors" + "\nLogging: " + this.messagesUtil.infos() + "\nSome errors: " + this.messagesUtil.errors(), "Mapping logging");
+			} else {
+				DialogUtility.showInfos("Mapping done and have no errors" + "\nLogging: " + this.messagesUtil.infos(), "Mapping logging");
+//				DialogUtility.showInfos(this.messagesUtil.successes(), "Mapping logging");
+			}
+		}
+		/**
+		 * Mapping tables to classes
+		 * @param owlFactory
+		 * @param inActive
+		 */
+		public void mappingClass(OWLOperationImpl owlFactory, boolean inActive) {
+			//create classes
+			DatabaseMappingViewComponent.this.databaseInfos.sortTablesByCase();
+			for(DBObjectTable table : DatabaseMappingViewComponent.this.databaseInfos.getTables()) {
+				try {
 					if(table.getTableCase() == DBObjectType.CASE_3) {
-						for(DBObjectColumn col : table.getColumns()) {
-							if(col.isForeignKey()) {
-								DBObjectForeignKey fk = table.getFKByColumnName(col.getName());
-								handleCreateObjectProperty(owlFactory, "has" + fk.getFKColumn(), fk.getFKTable(), fk.getToTable());
-							} else if(!col.isPrimaryKey()) {
-								handleCreateDataProperty(owlFactory, table, col, iri);
-							}
+						owlFactory.addOWLOperation(owlFactory.createOWLClass(table.getName()).getOntologyChanges().get(0));
+						this.messagesUtil.addInfo("Created owl class " + table.getName(), "done");
+						if(inActive) {
+							handleCreateSubClassAxiom(owlFactory, table, classSelector.getSelectedObject());
+							this.messagesUtil.addInfo("Created subclass axiom " + table.getName() + " subclass of " + classSelector.getSelectedObject().getIRI().getFragment(), "done");
 						}
 					} else if(table.getTableCase() == DBObjectType.CASE_2) {
-						for(DBObjectColumn col : table.getColumns()) {
-							if(col.isForeignKey() && !col.isPrimaryKey()) {
-								DBObjectForeignKey fk = table.getFKByColumnName(col.getName());
-								handleCreateObjectProperty(owlFactory, "has" + fk.getFKColumn(), fk.getFKTable(), fk.getToTable());
-							}
-							else if(!col.isPrimaryKey() && !col.isForeignKey()) {
-								handleCreateDataProperty(owlFactory, table, col, iri);
-							}
+						owlFactory.addOWLOperation(owlFactory.createOWLClass(table.getName()).getOntologyChanges().get(0));
+						this.messagesUtil.addInfo("Created owl class " + table.getName(), "done");
+						handleCreateSubClassAxiom(owlFactory, table);
+					}
+				} catch (OWLEntityCreationException e) {
+					this.messagesUtil.addError("OWLClass creation exception for " + table.getName(), e.getMessage());
+				}
+			}
+		}
+		/**
+		 * Mapping columns to properties
+		 * @param owlFactory
+		 */
+		public void mappingProperties(OWLOperationImpl owlFactory) {
+			IRI iri = owlFactory.getDataTypeBaseIRI();
+			for(DBObjectTable table : DatabaseMappingViewComponent.this.databaseInfos.getTables()) {
+				if(table.getTableCase() == DBObjectType.CASE_3) {
+					for(DBObjectColumn col : table.getColumns()) {
+						if(col.isForeignKey()) {
+							DBObjectForeignKey fk = table.getFKByColumnName(col.getName());
+							handleCreateObjectProperty(owlFactory, "has" + fk.getFKColumn(), fk.getFKTable(), fk.getToTable());
+						} else if(!col.isPrimaryKey()) {
+							handleCreateDataProperty(owlFactory, table, col, iri);
 						}
-					} else if(table.getTableCase() == DBObjectType.CASE_1) {
-						List<DBObjectForeignKey> listFK = table.getForeignKeys();
-						if(listFK.size() >= 2) {
-							String pkTable = listFK.get(0).getToTable();
-							String pkTableInverse = listFK.get(1).getToTable();
-							OWLObjectProperty op = handleCreateObjectProperty(owlFactory, "has" + table.getName(), pkTable, pkTableInverse);
-							OWLObjectProperty opInverse = handleCreateObjectProperty(owlFactory, "is" + table.getName() + "Of", pkTableInverse, pkTable);
+					}
+				} else if(table.getTableCase() == DBObjectType.CASE_2) {
+					for(DBObjectColumn col : table.getColumns()) {
+						if(col.isForeignKey() && !col.isPrimaryKey()) {
+							DBObjectForeignKey fk = table.getFKByColumnName(col.getName());
+							handleCreateObjectProperty(owlFactory, "has" + fk.getFKColumn(), fk.getFKTable(), fk.getToTable());
+						} else if(!col.isPrimaryKey() && !col.isForeignKey()) {
+							handleCreateDataProperty(owlFactory, table, col, iri);
+						}
+					}
+				} else if(table.getTableCase() == DBObjectType.CASE_1) {
+					List<DBObjectForeignKey> listFK = table.getForeignKeys();
+					if(listFK.size() >= 2) {
+						String pkTable = listFK.get(0).getToTable();
+						String pkTableInverse = listFK.get(1).getToTable();
+						OWLObjectProperty op = handleCreateObjectProperty(owlFactory, "has" + table.getName(), pkTable, pkTableInverse);
+						OWLObjectProperty opInverse = handleCreateObjectProperty(owlFactory, "is" + table.getName() + "Of", pkTableInverse, pkTable);
+						if(!(op == null || opInverse == null)) {
 							OWLAxiom inverse = (OWLAxiom)owlFactory.getInverseObjectPropertiesAxiom(op, opInverse);
 							owlFactory.addOWLOperation(owlFactory.createOWLOntologyChange(inverse));
+							this.messagesUtil.addInfo("Created inverse axiom for " + " has" + table.getName() + " inverse with " + "is" + table.getName() + "Of", "done");
 						}
-					} else {
-						log.info("the " + table.getName() + " is not classified yet ");
 					}
+				} else {
+					log.info("the " + table.getName() + " is not classified yet ");
 				}
-				owlFactory.applyOWLOperations();
-				DialogUtility.showMessages("Mapping success");
-			} catch(Exception e) {
-				DialogUtility.showError(e.getMessage());
 			}
 		}
 		
-		public void handleCreateSubClassAxiom(OWLOperationImpl owlFactory, DBObjectTable table, OWLClass superClass) throws URISyntaxException {
-			OWLAxiom ax = (OWLAxiom) owlFactory.getSubClassAxiom(owlFactory.getOWLClass(table.getName()), superClass);
-			OWLOntologyChange change = owlFactory.createOWLOntologyChange(ax);
-			owlFactory.addOWLOperation(change);
-		}
-		
-		public void handleCreateSubClassAxiom(OWLOperationImpl owlFactory, DBObjectTable table) throws URISyntaxException {
-			List<DBObjectPrimaryKey> pks = table.getPrimaryKeys();
-			for(DBObjectPrimaryKey obj : pks) {
-				DBObjectForeignKey fk = table.getFKByColumnName(obj.getColumn());
-				OWLAxiom ax = (OWLAxiom) owlFactory.getSubClassAxiom(fk.getFKTable(), fk.getToTable());
+		//need be add: add message error to capture the errors
+		//add handle when class or data property or object property exist
+		public void handleCreateSubClassAxiom(OWLOperationImpl owlFactory, DBObjectTable table, OWLClass superClass) {
+			try {
+				OWLAxiom ax = (OWLAxiom) owlFactory.getSubClassAxiom(owlFactory.getOWLClass(table.getName()), superClass);
 				OWLOntologyChange change = owlFactory.createOWLOntologyChange(ax);
 				owlFactory.addOWLOperation(change);
+			} catch (URISyntaxException e) {
+				this.messagesUtil.addError("Create subclass axiom exception " + table.getName(), e.getMessage());
 			}
 		}
 		
-		public OWLObjectProperty handleCreateObjectProperty(OWLOperationImpl owlFactory, String propName, String domain, String range) throws OWLEntityCreationException, URISyntaxException {
-			OWLEntityCreationSet<OWLObjectProperty> set = owlFactory.createOWLObjectProperty(propName);
-			owlFactory.addOWLOperation(set.getOntologyChanges().get(0));
-			OWLAxiom axDom = (OWLAxiom) owlFactory.getObjectPropertyDomainAxiom(set.getOWLEntity(), owlFactory.getOWLClass(domain));
-			owlFactory.addOWLOperation(owlFactory.createOWLOntologyChange(axDom));
-			OWLAxiom axRan = (OWLAxiom) owlFactory.getObjectPropertyRangeAxiom(set.getOWLEntity(), owlFactory.getOWLClass(range));
-			owlFactory.addOWLOperation(owlFactory.createOWLOntologyChange(axRan));
-			return set.getOWLEntity();
+		public void handleCreateSubClassAxiom(OWLOperationImpl owlFactory, DBObjectTable table) {
+			List<DBObjectPrimaryKey> pks = table.getPrimaryKeys();
+			for(DBObjectPrimaryKey obj : pks) {
+				try {
+					DBObjectForeignKey fk = table.getFKByColumnName(obj.getColumn());
+					OWLAxiom ax = (OWLAxiom) owlFactory.getSubClassAxiom(fk.getFKTable(), fk.getToTable());
+					OWLOntologyChange change = owlFactory.createOWLOntologyChange(ax);
+					owlFactory.addOWLOperation(change);
+					this.messagesUtil.addInfo("Created subclass axiom " + fk.getFKTable() + " subclass of " + fk.getToTable(), "done");
+				} catch (URISyntaxException e) {
+					this.messagesUtil.addError("Create subclass axiom exception " + table.getName(), e.getMessage());
+				}
+			}
 		}
 		
-		public OWLDataProperty handleCreateDataProperty(OWLOperationImpl owlFactory, DBObjectTable table, DBObjectColumn col, IRI iri) throws OWLEntityCreationException, URISyntaxException {
-			OWLEntityCreationSet<OWLDataProperty> set = owlFactory.createOWLDataProperty(table.getName() + "_" + col.getName());
-			owlFactory.addOWLOperation(set.getOntologyChanges().get(0));
-			OWLAxiom axDom = (OWLAxiom) owlFactory.getDataPropertyDomainAxiom(set.getOWLEntity(), owlFactory.getOWLClass(table.getName()));
-			owlFactory.addOWLOperation(owlFactory.createOWLOntologyChange(axDom));
-			String type = DBDataType.getRealType(col.getTypeName());
-			OWLDataRange dr = owlFactory.getDataRange(iri + "#" + type);
-			OWLAxiom axRan = (OWLAxiom) owlFactory.getDataPropertyRangeAxiom(set.getOWLEntity(), dr);
-			owlFactory.addOWLOperation(owlFactory.createOWLOntologyChange(axRan));
-			return set.getOWLEntity();
+		public OWLObjectProperty handleCreateObjectProperty(OWLOperationImpl owlFactory, String propName, String domain, String range) {
+			OWLObjectProperty entity = null;
+			boolean hasError = false;
+			try {
+				if(owlFactory.getOWLObjectProperty(propName) != null) {
+					entity = owlFactory.getOWLObjectProperty(propName);
+					this.messagesUtil.addInfo("Created object property " + propName, "done");
+				} else {
+					OWLEntityCreationSet<OWLObjectProperty> set = owlFactory.createOWLObjectProperty(propName);
+					log.info("" + propName);
+					owlFactory.addOWLOperation(set.getOntologyChanges().get(0));
+					entity = set.getOWLEntity();
+				}
+				OWLAxiom axDom = (OWLAxiom) owlFactory.getObjectPropertyDomainAxiom(entity, owlFactory.getOWLClass(domain));
+				owlFactory.addOWLOperation(owlFactory.createOWLOntologyChange(axDom));
+				OWLAxiom axRan = (OWLAxiom) owlFactory.getObjectPropertyRangeAxiom(entity, owlFactory.getOWLClass(range));
+				owlFactory.addOWLOperation(owlFactory.createOWLOntologyChange(axRan));
+			} catch (OWLEntityCreationException e) {
+				hasError = true;
+				this.messagesUtil.addError("OWL object property creation exception " + propName, e.getMessage());
+			} catch (URISyntaxException e) {
+				hasError = true;
+				this.messagesUtil.addError("Get object property domain/range axiom " + propName, e.getMessage());
+			}
+			return (hasError ? null : entity);
+		}
+		
+		public OWLDataProperty handleCreateDataProperty(OWLOperationImpl owlFactory, DBObjectTable table, DBObjectColumn col, IRI iri) {
+			OWLDataProperty entity = null;
+			String propName = "has" + col.getName();
+			boolean hasError = false;
+			try {
+				if(owlFactory.getOWLDataProperty(propName) != null) {
+					entity = owlFactory.getOWLDataProperty(propName);
+					this.messagesUtil.addInfo("Created data property " + propName, "done");
+				} else {
+					OWLEntityCreationSet<OWLDataProperty> set = owlFactory.createOWLDataProperty(propName);
+					owlFactory.addOWLOperation(set.getOntologyChanges().get(0));
+					entity = set.getOWLEntity();
+				}
+				OWLAxiom axDom = (OWLAxiom) owlFactory.getDataPropertyDomainAxiom(entity, owlFactory.getOWLClass(table.getName()));
+				owlFactory.addOWLOperation(owlFactory.createOWLOntologyChange(axDom));
+				String type = DBDataType.getRealType(col.getTypeName());
+				OWLDataRange dr = owlFactory.getDataRange(iri + "#" + type);
+				OWLAxiom axRan = (OWLAxiom) owlFactory.getDataPropertyRangeAxiom(entity, dr);
+				owlFactory.addOWLOperation(owlFactory.createOWLOntologyChange(axRan));
+			} catch (OWLEntityCreationException e) {
+				hasError = true;
+				this.messagesUtil.addError("OWL data property creation exception " + propName, e.getMessage());
+			} catch (URISyntaxException e) {
+				hasError = true;
+				this.messagesUtil.addError("Get OWL class exception " + propName, e.getMessage());
+			}
+			return (hasError ? null : entity);
 		}
 		
 		public void handleCreateCardinality(OWLOperationImpl owlFactory, DBObjectColumn col, OWLEntity prop) {

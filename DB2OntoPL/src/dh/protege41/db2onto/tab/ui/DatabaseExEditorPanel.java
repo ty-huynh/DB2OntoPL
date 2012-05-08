@@ -1,6 +1,7 @@
 package dh.protege41.db2onto.tab.ui;
 
 import java.awt.BorderLayout;
+import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Font;
 import java.awt.GridBagLayout;
@@ -12,6 +13,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import javax.swing.BorderFactory;
 import javax.swing.JCheckBox;
@@ -28,14 +30,18 @@ import org.protege.editor.owl.OWLEditorKit;
 import org.protege.editor.owl.model.entity.OWLEntityCreationException;
 import org.protege.editor.owl.model.entity.OWLEntityCreationSet;
 import org.protege.editor.owl.model.hierarchy.OWLAnnotationPropertyHierarchyProvider;
+import org.protege.editor.owl.model.hierarchy.OWLObjectHierarchyProvider;
 import org.protege.editor.owl.ui.UIHelper;
 import org.protege.editor.owl.ui.selector.OWLAnnotationPropertySelectorPanel;
 import org.protege.editor.owl.ui.selector.OWLClassSelectorPanel;
+import org.protege.editor.owl.ui.selector.OWLDataPropertySelectorPanel;
 import org.semanticweb.owlapi.model.OWLAnnotationProperty;
 import org.semanticweb.owlapi.model.OWLAnnotationSubject;
 import org.semanticweb.owlapi.model.OWLAnnotationValue;
+import org.semanticweb.owlapi.model.OWLDataProperty;
 import org.semanticweb.owlapi.model.OWLDatatype;
 import org.semanticweb.owlapi.model.OWLException;
+import org.semanticweb.owlapi.model.OWLLiteral;
 import org.semanticweb.owlapi.model.OWLNamedIndividual;
 import org.semanticweb.owlapi.model.OWLOntologyChange;
 import org.semanticweb.owlapi.model.OWLOntologyChangeListener;
@@ -67,6 +73,7 @@ public class DatabaseExEditorPanel extends JPanel implements DatabasePanel {
 	private JCheckBox cbCheckAll;
 	private JLabel lbColumnHeader;
 	private JLabel lbAnnoHeader;
+	private JLabel lbDataPropHeader;
 	private JLabel lbTypeHeader;
 	private JLabel lbLangHeader;
 	
@@ -78,6 +85,7 @@ public class DatabaseExEditorPanel extends JPanel implements DatabasePanel {
 	
 	private OWLClassSelectorPanel classSelector;
 	private OWLAnnotationPropertySelectorPanel annoPropertySelector;
+	private OWLDataPropertySelectorPanel dataPropertySelector;
 	
 	private List<RowPanel> listRowPanel = new ArrayList<RowPanel>();
 	
@@ -94,6 +102,7 @@ public class DatabaseExEditorPanel extends JPanel implements DatabasePanel {
 	
 	public void loadSelectors() {
 		classSelector = new OWLClassSelectorPanel(_owlEditorKit, false);
+		classSelector.setPreferredSize(new Dimension(200, 600));
 		classSelector.addSelectionListener(new ChangeListener() {
 			
 			@Override
@@ -105,6 +114,7 @@ public class DatabaseExEditorPanel extends JPanel implements DatabasePanel {
 			}
 		});
 		annoPropertySelector = new OWLAnnotationPropertySelectorPanel(_owlEditorKit, true);
+		annoPropertySelector.setPreferredSize(new Dimension(200, 300));
 		annoPropertySelector.getOWLModelManager().addOntologyChangeListener(new OWLOntologyChangeListener() {
 			
 			@Override
@@ -115,23 +125,39 @@ public class DatabaseExEditorPanel extends JPanel implements DatabasePanel {
 				}
 			}
 		});
+		dataPropertySelector = new OWLDataPropertySelectorPanel(_owlEditorKit, true);
+		dataPropertySelector.setPreferredSize(new Dimension(200, 300));
+		dataPropertySelector.getOWLModelManager().addOntologyChangeListener(new OWLOntologyChangeListener() {
+			
+			@Override
+			public void ontologiesChanged(List<? extends OWLOntologyChange> arg0)
+					throws OWLException {
+				for(RowPanel rp : listRowPanel) {
+					rp.reloadDataPropComboBox();
+				}
+			}
+		});
 		JSplitPane splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT);
+		JSplitPane splitVerticalPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT);
+		splitVerticalPane.setTopComponent(dataPropertySelector);
+		splitVerticalPane.setBottomComponent(annoPropertySelector);
+		
 		selectorPanel = new JPanel(new BorderLayout());
 		selectorPanel.add(splitPane);
 		splitPane.setLeftComponent(classSelector);
-		splitPane.setRightComponent(annoPropertySelector);
+		splitPane.setRightComponent(splitVerticalPane);
 	}
 	
 	@Override
 	public void initComponents() {
 		setLayout(new BorderLayout());
-		setSize(getPreferredSize().width, 400);
-		
+		this.setPreferredSize(new Dimension(1000, 600));
 		topPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
 		topPanel.setBorder(BorderFactory.createEmptyBorder(5, 20, 5, 0));
 		
 		centerPanel = new JPanel(new GridBagLayout());
 		mainPanel = new JPanel(new BorderLayout());
+		mainPanel.setPreferredSize(new Dimension(600, 600));
 		
 		tfClass = new JTextField(30);
 		FontUtility.setSmallLabel(tfClass, Font.BOLD);
@@ -143,6 +169,10 @@ public class DatabaseExEditorPanel extends JPanel implements DatabasePanel {
 		lbColumnHeader = new JLabel("Columns");
 		FontUtility.setSmallLabel(lbColumnHeader, Font.BOLD);
 		formUtility.setPreferredSize(lbColumnHeader, DBColumnSize.DB_COLUMN_SIZE_4);
+		
+		lbDataPropHeader = new JLabel("Data Property");
+		FontUtility.setSmallLabel(lbDataPropHeader, Font.BOLD);
+		formUtility.setPreferredSize(lbDataPropHeader, DBColumnSize.DB_COLUMN_SIZE_5);
 		
 		lbAnnoHeader = new JLabel("Annotation Property");
 		FontUtility.setSmallLabel(lbAnnoHeader, Font.BOLD);
@@ -166,6 +196,7 @@ public class DatabaseExEditorPanel extends JPanel implements DatabasePanel {
 		JPanel pnHeader = new JPanel(new GridBagLayout());
 		formUtility.addLabel(cbCheckAll, pnHeader);
 		formUtility.addLabel(lbColumnHeader, pnHeader);
+		formUtility.addLabel(lbDataPropHeader, pnHeader);
 		formUtility.addLabel(lbAnnoHeader, pnHeader);
 		formUtility.addLabel(lbTypeHeader, pnHeader);
 		formUtility.addLabel(lbLangHeader, pnHeader);
@@ -230,12 +261,24 @@ public class DatabaseExEditorPanel extends JPanel implements DatabasePanel {
 						OWLAnnotationSubject subject = operation.getAnnotationSubject(indi.getOWLEntity());
 						OWLAnnotationProperty AnnoProperty = (OWLAnnotationProperty)rp.getSelectedAnnotationProperty();
 						OWLAnnotationValue value = operation.createAnnotationValue(row.get(j));
-						if(rp.getSelectedLang() != null) {
-							value = operation.createAnnotationValue(row.get(j), (String)rp.getSelectedLang());
-						} else if(rp.getSelectedDataType() != null) {
-							value = operation.createAnnotationValue(row.get(j), (OWLDatatype)rp.getSelectedDataType());
+						if(AnnoProperty != null) {
+							if(rp.getSelectedLang() != null) {
+								value = operation.createAnnotationValue(row.get(j), (String)rp.getSelectedLang());
+							} else if(rp.getSelectedDataType() != null) {
+								value = operation.createAnnotationValue(row.get(j), (OWLDatatype)rp.getSelectedDataType());
+							}
+							operation.addOWLOperation(operation.createOWLOntologyChange(operation.createAnnotationForIndividual(subject, AnnoProperty, value)));
 						}
-						operation.addOWLOperation(operation.createOWLOntologyChange(operation.createAnnotationForIndividual(subject, AnnoProperty, value)));
+						OWLDataProperty dataProp = (OWLDataProperty) rp.getSelectedDataProperty();
+						if(dataProp != null) {
+							OWLLiteral literal = (OWLLiteral) operation.createAnnotationValue(row.get(j));
+							if(rp.getSelectedLang() != null) {
+								literal = (OWLLiteral) operation.createAnnotationValue(row.get(j), (String)rp.getSelectedLang());
+							} else if(rp.getSelectedDataType() != null) {
+								literal = (OWLLiteral) operation.createAnnotationValue(row.get(j), (OWLDatatype)rp.getSelectedDataType());
+							}
+							operation.addOWLOperation(operation.createOWLOntologyChange(operation.createDataPropertyAssertion(dataProp, indi.getOWLEntity(), literal)));
+						}
 					}
 				}
 			}
@@ -243,6 +286,8 @@ public class DatabaseExEditorPanel extends JPanel implements DatabasePanel {
 			DialogUtility.showMessages("The individuals have been created");
 		} catch (OWLEntityCreationException e) {
 			DialogUtility.showError(e.getMessage());
+		} catch (NullPointerException eNull) {
+			DialogUtility.showError(eNull.getMessage());
 		}
 //		try {
 //			
@@ -283,11 +328,14 @@ public class DatabaseExEditorPanel extends JPanel implements DatabasePanel {
 		private static final long serialVersionUID = 8177361719884143514L;
 		private JCheckBox cbSelect;
 		private JLabel lbColumn;
+		private JComboBox cbbDataProperty;
 		private JComboBox cbbAnnotationProperty;
 		private JComboBox cbbType;
 		private JComboBox cbbLang;
 		
 		private String lastAnnoPropSelected = "comment";
+		private String lastDataPropSelected = null;
+		private Map<String, OWLDataProperty> mapDataProperty;
 		private Map<String, OWLAnnotationProperty> mapAnnotationProperty;
 		
 		public RowPanel() {
@@ -326,6 +374,7 @@ public class DatabaseExEditorPanel extends JPanel implements DatabasePanel {
 		public void resetPreferredSize() {
 			formUtility.setPreferredSize(cbSelect, DBColumnSize.DB_COLUMN_SIZE_2);
 			formUtility.setPreferredSize(lbColumn, DBColumnSize.DB_COLUMN_SIZE_4);
+			formUtility.setPreferredSize(cbbDataProperty, DBColumnSize.DB_COLUMN_SIZE_5);
 			formUtility.setPreferredSize(cbbAnnotationProperty, DBColumnSize.DB_COLUMN_SIZE_5);
 			formUtility.setPreferredSize(cbbType, DBColumnSize.DB_COLUMN_SIZE_4 + DBColumnSize.DB_COLUMN_SIZE_3);
 			formUtility.setPreferredSize(cbbLang, 2 * DBColumnSize.DB_COLUMN_SIZE_2);
@@ -335,6 +384,7 @@ public class DatabaseExEditorPanel extends JPanel implements DatabasePanel {
 		public void attachComponents() {
 			formUtility.addLabel(cbSelect, this);
 			formUtility.addLabel(lbColumn, this);
+			formUtility.addLabel(cbbDataProperty, this);
 			formUtility.addLabel(cbbAnnotationProperty, this);
 			formUtility.addLabel(cbbType, this);
 			formUtility.addLabel(cbbLang, this);
@@ -384,9 +434,58 @@ public class DatabaseExEditorPanel extends JPanel implements DatabasePanel {
 			this.cbbLang.setEditable(false);
 			
 			this.cbbType = helper.getDatatypeSelector();
+			reloadDataPropComboBox();
 			reloadAnnoPropComboBox();
 		}
-
+		
+		public void reloadDataPropComboBox() {
+			if(mapDataProperty != null)
+				mapDataProperty.clear();
+			if(cbbDataProperty != null) {
+				cbbDataProperty.removeAllItems();
+				this.revalidate();
+			} else {
+				cbbDataProperty = new JComboBox();
+				cbbDataProperty.addItemListener(new ItemListener() {
+					
+					@Override
+					public void itemStateChanged(ItemEvent e) {
+						// TODO Auto-generated method stub
+						if(e.getStateChange() == ItemEvent.SELECTED) {
+							RowPanel.this.lastDataPropSelected = new String(e.getItem().toString());
+							if(!"".equals(RowPanel.this.lastDataPropSelected)) {
+								RowPanel.this.cbbAnnotationProperty.setSelectedItem("");
+							}
+						}
+					}
+				});
+			}
+			cbbDataProperty.addItem("");
+			cbbDataProperty.setSelectedItem("");
+			//get OWLAnnotationProperty
+			mapDataProperty = new HashMap<String, OWLDataProperty>();
+			
+			OWLObjectHierarchyProvider<OWLDataProperty> hp = DatabaseExEditorPanel.this._owlEditorKit.getOWLModelManager().getOWLHierarchyManager().getOWLDataPropertyHierarchyProvider();
+			for(OWLDataProperty dp : hp.getRoots()) {
+				if(dp != DatabaseExEditorPanel.this._owlEditorKit.getOWLModelManager().getOWLDataFactory().getOWLTopDataProperty()) {
+					String owlname = dp.getIRI().getFragment();
+					mapDataProperty.put(owlname, dp);
+					cbbDataProperty.addItem(owlname);
+				}
+				Set<OWLDataProperty> descendants = hp.getDescendants(dp);
+				if(descendants.size() > 0) {
+					for(OWLDataProperty dpDesc : descendants) {
+						mapDataProperty.put(dpDesc.getIRI().getFragment(), dpDesc);
+						cbbDataProperty.addItem(dpDesc.getIRI().getFragment());
+					}
+				}
+			}
+//			if(mapDataProperty.containsKey(lastDataPropSelected))
+//				cbbDataProperty.setSelectedItem(lastDataPropSelected);
+			
+			this.revalidate();
+		}
+		
 		public void reloadAnnoPropComboBox() {
 			
 			if(mapAnnotationProperty != null)
@@ -403,22 +502,32 @@ public class DatabaseExEditorPanel extends JPanel implements DatabasePanel {
 						// TODO Auto-generated method stub
 						if(e.getStateChange() == ItemEvent.SELECTED) {
 							RowPanel.this.lastAnnoPropSelected = new String(e.getItem().toString());
-//							log.info("last anno pro selected :  " + e.getItem());
+							if(!"".equals(RowPanel.this.lastAnnoPropSelected)) {
+								RowPanel.this.cbbDataProperty.setSelectedItem("");
+							}
 						}
 					}
 				});
 			}
+			cbbAnnotationProperty.addItem("");
+			cbbAnnotationProperty.setSelectedItem("");
 			//get OWLAnnotationProperty
 			mapAnnotationProperty = new HashMap<String, OWLAnnotationProperty>();
 			OWLAnnotationPropertyHierarchyProvider hp = DatabaseExEditorPanel.this._owlEditorKit.getOWLModelManager().getOWLHierarchyManager().getOWLAnnotationPropertyHierarchyProvider();
 			for(OWLAnnotationProperty ap : hp.getRoots()) {
-				String owlIri = ap.getIRI().toString();
-				String owlname = owlIri.substring(owlIri.indexOf('#') + 1);
+				String owlname = ap.getIRI().getFragment();
 				mapAnnotationProperty.put(owlname, ap);
 				cbbAnnotationProperty.addItem(owlname);
+				Set<OWLAnnotationProperty> descendants = hp.getDescendants(ap);
+				if(descendants.size() > 0) {
+					for(OWLAnnotationProperty apDes : descendants) {
+						mapAnnotationProperty.put(apDes.getIRI().getFragment(), apDes);
+						cbbAnnotationProperty.addItem(apDes.getIRI().getFragment());
+					}
+				}
 			}
-			if(mapAnnotationProperty.containsKey(lastAnnoPropSelected))
-				cbbAnnotationProperty.setSelectedItem(lastAnnoPropSelected);
+//			if(mapAnnotationProperty.containsKey(lastAnnoPropSelected))
+//				cbbAnnotationProperty.setSelectedItem(lastAnnoPropSelected);
 			
 			this.revalidate();
 		}
@@ -442,5 +551,10 @@ public class DatabaseExEditorPanel extends JPanel implements DatabasePanel {
 		public Object getSelectedAnnotationProperty() {
 			return mapAnnotationProperty.get(cbbAnnotationProperty.getSelectedItem());//OWLAnnotationProperty
 		}
+		
+		public Object getSelectedDataProperty() {
+			return mapDataProperty.get(cbbDataProperty.getSelectedItem());//OWLDataProperty
+		}
+		
 	}
 }

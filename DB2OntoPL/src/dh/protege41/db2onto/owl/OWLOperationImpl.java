@@ -34,6 +34,7 @@ import org.semanticweb.owlapi.model.OWLDataFactory;
 import org.semanticweb.owlapi.model.OWLDataMaxCardinality;
 import org.semanticweb.owlapi.model.OWLDataMinCardinality;
 import org.semanticweb.owlapi.model.OWLDataProperty;
+import org.semanticweb.owlapi.model.OWLDataPropertyAssertionAxiom;
 import org.semanticweb.owlapi.model.OWLDataPropertyDomainAxiom;
 import org.semanticweb.owlapi.model.OWLDataPropertyExpression;
 import org.semanticweb.owlapi.model.OWLDataPropertyRangeAxiom;
@@ -42,6 +43,7 @@ import org.semanticweb.owlapi.model.OWLDatatype;
 import org.semanticweb.owlapi.model.OWLEntity;
 import org.semanticweb.owlapi.model.OWLIndividual;
 import org.semanticweb.owlapi.model.OWLInverseObjectPropertiesAxiom;
+import org.semanticweb.owlapi.model.OWLLiteral;
 import org.semanticweb.owlapi.model.OWLNamedIndividual;
 import org.semanticweb.owlapi.model.OWLObjectMaxCardinality;
 import org.semanticweb.owlapi.model.OWLObjectMinCardinality;
@@ -72,7 +74,9 @@ public class OWLOperationImpl implements OWLOperation {
 	
 	public OWLOperationImpl() {
 	}
-	
+	public OWLModelManager getModelManager() {
+		return this._owlModelManager;
+	}
 	public OWLOperationImpl(OWLEditorKit ekit) {
 		_owlEditorKit = ekit;
 		_owlModelManager = _owlEditorKit.getOWLModelManager();
@@ -162,7 +166,10 @@ public class OWLOperationImpl implements OWLOperation {
 			OWLAnnotationValue value) {
 		return _owlDataFactory.getOWLAnnotationAssertionAxiom(property, subject, value);
 	}
-
+	
+	public OWLDataPropertyAssertionAxiom createDataPropertyAssertion(OWLDataProperty prop, OWLIndividual subject, OWLLiteral value) {
+		return _owlDataFactory.getOWLDataPropertyAssertionAxiom(prop, subject, value);
+	}
 	@Override
 	public OWLEntityCreationSet<OWLNamedIndividual> createOWLIndividual(
 			String name, IRI baseIri) throws OWLEntityCreationException {

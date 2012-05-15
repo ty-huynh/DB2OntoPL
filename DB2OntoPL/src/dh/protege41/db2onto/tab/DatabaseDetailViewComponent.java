@@ -25,6 +25,7 @@ import dh.protege41.db2onto.event.dbobject.DBObjectDatabase;
 import dh.protege41.db2onto.event.dbobject.DBObjectForeignKey;
 import dh.protege41.db2onto.event.dbobject.DBObjectPrimaryKey;
 import dh.protege41.db2onto.event.dbobject.DBObjectTable;
+import dh.protege41.db2onto.event.dbobject.DBObjectType;
 import dh.protege41.db2onto.event.dboperation.DBOperationEventType;
 import dh.protege41.db2onto.event.dboperation.DBOperationObject;
 import dh.protege41.db2onto.tab.ui.DatabasePanel;
@@ -130,6 +131,7 @@ public class DatabaseDetailViewComponent extends DatabaseViewComponent {
 			if(event.equalsIgnoreCase(DBOperationEventType.DB_OPERATION_CONNECTED)) {
 				dbOperationImpl = getDBOperationImpl();
 				processDatabaseMetaData();
+				classifyTable();
 				buildDatabaseTree();
 			} else if (DBOperationEventType.DB_OPERATION_CONNECT.equals(event)) {
 				handleConnect();
@@ -226,12 +228,35 @@ public class DatabaseDetailViewComponent extends DatabaseViewComponent {
 						databaseInfos.getTableByName(fk.getFKTable()).getColumnByName(fk.getFKColumn()).setForeignKey(true);
 					}
 				}
-				databaseInfos.classifyTable();
+				
 			} catch (Exception e) {
 				log.info("Error: process database");
 			}
 		}
 		
+		public void classifyTable() {
+			for(DBObjectTable table : databaseInfos.getTables()) {
+				//case 1
+				if((table.getForeignKeys().size() == table.getColumns().size()) && (table.getPrimaryKeys().size() == table.getColumns().size()) && (table.getColumns().size() == 2)) {
+					table.setTableCase(DBObjectType.CASE_1);
+//					log.info("table  " + table.getName() + " in case " + table.getTableCase());
+					continue;
+				}
+				boolean isCase2 = true;
+				for(DBObjectPrimaryKey pk : table.getPrimaryKeys()) {
+					DBObjectColumn colPK = table.getColumnByName(pk.getColumn());
+					if(!colPK.isForeignKey()) {
+						isCase2 = false;
+						//case 3
+						table.setTableCase(DBObjectType.CASE_3);
+						break;
+					}
+				}
+				//case 2
+				if(isCase2) table.setTableCase(DBObjectType.CASE_2);
+//				log.info("table  " + table.getName() + " in case " + table.getTableCase());
+			}
+		}
 		/**
 		 * Create database info tree when connected to database
 		 */

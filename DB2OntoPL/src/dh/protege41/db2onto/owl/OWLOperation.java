@@ -1,5 +1,7 @@
 package dh.protege41.db2onto.owl;
 
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.List;
 
@@ -20,7 +22,11 @@ import org.semanticweb.owlapi.model.OWLEntity;
 import org.semanticweb.owlapi.model.OWLIndividual;
 import org.semanticweb.owlapi.model.OWLLiteral;
 import org.semanticweb.owlapi.model.OWLNamedIndividual;
+import org.semanticweb.owlapi.model.OWLObjectProperty;
+import org.semanticweb.owlapi.model.OWLOntology;
 import org.semanticweb.owlapi.model.OWLOntologyChange;
+import org.semanticweb.owlapi.model.OWLOntologyCreationException;
+import org.semanticweb.owlapi.model.OWLOntologyID;
 import org.semanticweb.owlapi.vocab.OWL2Datatype;
 
 public abstract interface OWLOperation {
@@ -83,4 +89,38 @@ public abstract interface OWLOperation {
 	public abstract void addOWLOperation(OWLOntologyChange change);
 
 	public List<OWLOntologyChange> getOWLOperations();
+
+	/**
+	 * ontology
+	 */
+	public OWLOntology createNewOntology(OWLOntologyID ontoID, URI location);
+
+	public OWLOntology createNewOntology(String ontoID, String location)
+			throws OWLOntologyCreationException;
+
+	/**
+	 * Class
+	 */
+	public OWLEntityCreationSet<OWLClass> createOWLClass(String className,
+			IRI baseIRI) throws OWLEntityCreationException;
+
+	public OWLEntityCreationSet<OWLClass> createOWLClass(String className)
+			throws OWLEntityCreationException;
+
+	public OWLClass getOWLClass(String className) throws URISyntaxException;
+
+	/**
+	 * properties
+	 */
+	public OWLEntityCreationSet<OWLObjectProperty> createOWLObjectProperty(
+			String propName, IRI baseIRI) throws OWLEntityCreationException;
+
+	public OWLEntityCreationSet<OWLObjectProperty> createOWLObjectProperty(
+			String propName) throws OWLEntityCreationException;
+
+	public OWLEntityCreationSet<OWLDataProperty> createOWLDataProperty(
+			String propName, IRI baseIRI) throws OWLEntityCreationException;
+
+	public OWLEntityCreationSet<OWLDataProperty> createOWLDataProperty(
+			String propName) throws OWLEntityCreationException;
 }

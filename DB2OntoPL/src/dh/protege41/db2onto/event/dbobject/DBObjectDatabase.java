@@ -100,30 +100,6 @@ public class DBObjectDatabase extends DBObject {
 		this.tables.add(table);
 	}
 	
-	public void classifyTable() {
-		for(DBObjectTable table : this.tables) {
-			//case 1
-			if((table.getForeignKeys().size() == table.getColumns().size()) || (table.getPrimaryKeys().size() == table.getColumns().size())) {
-				table.setTableCase(DBObjectType.CASE_1);
-//				log.info("table  " + table.getName() + " in case " + table.getTableCase());
-				continue;
-			}
-			boolean isCase2 = true;
-			for(DBObjectPrimaryKey pk : table.getPrimaryKeys()) {
-				DBObjectColumn colPK = table.getColumnByName(pk.getColumn());
-				if(!colPK.isForeignKey()) {
-					isCase2 = false;
-					//case 3
-					table.setTableCase(DBObjectType.CASE_3);
-					break;
-				}
-			}
-			//case 2
-			if(isCase2) table.setTableCase(DBObjectType.CASE_2);
-//			log.info("table  " + table.getName() + " in case " + table.getTableCase());
-		}
-	}
-	
 	
 	public String getProductName() {
 		return productName;

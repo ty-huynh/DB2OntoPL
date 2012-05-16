@@ -87,14 +87,14 @@ public class DBObjectTable extends DBObject implements Comparable {
 	}
 	public void addPrimaryKey(DBObjectPrimaryKey pk) {
 		for(DBObjectPrimaryKey obj : this.primaryKeys) {
-			if(obj.getName().equals(pk.getName()))
+			if(obj.getColumn().equals(pk.getColumn()))
 				return;
 		}
 		this.primaryKeys.add(pk);
 	}
 	public void addForeignKey(DBObjectForeignKey fk) {
 		for(DBObjectForeignKey obj : this.foreignKeys) {
-			if(obj.getName().equals(fk.getName()))
+			if(obj.getFKColumn().equals(fk.getFKColumn()))
 				return;
 		}
 		this.foreignKeys.add(fk);
